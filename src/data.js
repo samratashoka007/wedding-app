@@ -891,9 +891,10 @@ function initAuthData() {
     }
 }
 
-// Generate random 4-digit OTP
+// Generate random 4-digit OTP (always returns string with leading zeros preserved)
 function generateOTP() {
-    return Math.floor(1000 + Math.random() * 9000).toString();
+    const num = Math.floor(Math.random() * 10000);
+    return num.toString().padStart(4, '0');
 }
 
 // Admin Password Management
@@ -920,18 +921,31 @@ function getCoordinatorOTPs() {
 }
 
 function setCoordinatorOTP(coordinatorName, otp) {
-    if (!/^\d{4}$/.test(otp)) {
+    const cleanOTP = otp ? otp.toString().trim() : '';
+    if (!/^\d{4}$/.test(cleanOTP)) {
         return { success: false, error: 'OTP must be exactly 4 digits' };
     }
     const otps = getCoordinatorOTPs();
-    otps[coordinatorName] = otp;
+    otps[coordinatorName] = cleanOTP;
     localStorage.setItem('coordinatorOTPs', JSON.stringify(otps));
+    console.log('OTP set for', coordinatorName, ':', cleanOTP);
     return { success: true };
 }
 
 function verifyCoordinatorOTP(coordinatorName, otp) {
     const otps = getCoordinatorOTPs();
-    return otps[coordinatorName] === otp;
+    const storedOTP = otps[coordinatorName];
+    const inputOTP = otp ? otp.toString().trim() : '';
+    
+    // Debug logging for troubleshooting
+    console.log('OTP Verification:', {
+        coordinatorName: coordinatorName,
+        inputOTP: inputOTP,
+        storedOTP: storedOTP,
+        allOTPs: Object.keys(otps)
+    });
+    
+    return storedOTP && storedOTP.toString().trim() === inputOTP;
 }
 
 function regenerateCoordinatorOTP(coordinatorName) {

@@ -283,11 +283,15 @@ function handleAdminPassword(e) {
 // Handle Coordinator OTP
 function handleCoordinatorOTP(e) {
   e.preventDefault();
-  const otp = document.getElementById('otp').value;
+  const otp = document.getElementById('otp').value.trim();
+  const coordinatorName = loginState.userInfo.coordinator.name;
 
-  if (verifyCoordinatorOTP(loginState.userInfo.coordinator.name, otp)) {
+  console.log('Attempting OTP login for:', coordinatorName, 'with OTP:', otp);
+
+  if (verifyCoordinatorOTP(coordinatorName, otp)) {
     completeLogin(loginState.userInfo);
   } else {
+    console.log('OTP verification failed for:', coordinatorName);
     renderCoordinatorOTPPrompt('❌ Incorrect access code. Please try again.');
   }
 }
