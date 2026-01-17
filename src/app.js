@@ -50,7 +50,9 @@ function setLanguage(lang) {
 // Find guest room assignment
 function findGuestRoom(name) {
   const lowerName = name.toLowerCase();
-  for (const guest of GUEST_LIST) {
+  // Use editable guests (includes admin changes)
+  const guests = getEditableGuests ? getEditableGuests() : GUEST_LIST;
+  for (const guest of guests) {
     if (lowerName.includes(guest.name.toLowerCase()) ||
       guest.name.toLowerCase().includes(lowerName)) {
       return guest;
@@ -539,9 +541,7 @@ function renderMyTasks() {
   });
 
   // Get ALL tasks assigned to this coordinator across all days
-  console.log('🔍 Coordinator name:', coord.name);
   const myTasks = getCoordinatorAllTasks(coord.name);
-  console.log('📋 Tasks found:', myTasks.length, myTasks);
   
   // Group tasks by day
   const tasksByDay = {
@@ -881,7 +881,9 @@ function toggleTask(task) {
 // Render Events Tab (Coordinator)
 function renderEventsTab() {
   const eventsByDate = {};
-  WEDDING_DATA.events.forEach(event => {
+  // Use editable events (includes admin changes)
+  const events = getEditableEvents ? getEditableEvents() : WEDDING_DATA.events;
+  events.forEach(event => {
     if (!eventsByDate[event.date]) {
       eventsByDate[event.date] = [];
     }
@@ -921,7 +923,9 @@ function renderEventsTab() {
 // Render Events Tab for Guests
 function renderEventsTabGuest() {
   const eventsByDate = {};
-  WEDDING_DATA.events.forEach(event => {
+  // Use editable events (includes admin changes)
+  const events = getEditableEvents ? getEditableEvents() : WEDDING_DATA.events;
+  events.forEach(event => {
     if (!eventsByDate[event.date]) {
       eventsByDate[event.date] = [];
     }
@@ -1168,7 +1172,9 @@ function renderTeamTab() {
 
 // Render Guest List Tab (Coordinator Only)
 function renderGuestListTab() {
-  const totalGuests = GUEST_LIST.reduce((sum, g) => sum + g.count, 0);
+  // Use editable guests (includes admin changes)
+  const guests = getEditableGuests ? getEditableGuests() : GUEST_LIST;
+  const totalGuests = guests.reduce((sum, g) => sum + g.count, 0);
 
   return `
     <div class="section-header">
@@ -1178,7 +1184,7 @@ function renderGuestListTab() {
     
     <div class="guest-summary">
       <div class="summary-item">
-        <span class="summary-number">${GUEST_LIST.length}</span>
+        <span class="summary-number">${guests.length}</span>
         <span class="summary-label">${t('familiesGroups')}</span>
       </div>
       <div class="summary-item">
@@ -1188,7 +1194,7 @@ function renderGuestListTab() {
     </div>
     
     <div class="guest-list">
-      ${GUEST_LIST.filter(g => g.room).map(guest => `
+      ${guests.filter(g => g.room).map(guest => `
         <div class="guest-card">
           <div class="guest-main">
             <div class="guest-name">${guest.name}</div>
@@ -1599,7 +1605,7 @@ function renderAdminSettings() {
       </div>
       <div class="info-row">
         <span>${t('totalGuests')}</span>
-        <span>${GUEST_LIST.length}</span>
+        <span>${(getEditableGuests ? getEditableGuests() : GUEST_LIST).length}</span>
       </div>
     </div>
   `;

@@ -1082,9 +1082,6 @@ const ALL_TASKS = [
 
 // Helper to get tasks for a specific coordinator
 function getCoordinatorAllTasks(coordinatorName) {
-    console.log('🎯 getCoordinatorAllTasks called with:', coordinatorName);
-    console.log('📊 ALL_TASKS count:', ALL_TASKS ? ALL_TASKS.length : 'undefined');
-    
     const name = coordinatorName.toLowerCase();
     
     // Helper to check if names match (handles partial names like "Pooja" vs "Pooja Nagar")
