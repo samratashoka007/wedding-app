@@ -1042,6 +1042,25 @@ function renderEventsTabGuest() {
       `).join('')}
     `).join('')
     }
+    
+    <!-- Wedding Quick Actions -->
+    <div class="wedding-actions-card">
+      <h3>📱 Quick Actions</h3>
+      <div class="wedding-action-buttons">
+        <button class="wedding-action-btn" onclick="shareWedding()">
+          <span class="action-icon">📤</span>
+          <span class="action-label">Share</span>
+        </button>
+        <button class="wedding-action-btn" onclick="addToCalendar()">
+          <span class="action-icon">📅</span>
+          <span class="action-label">Add to Calendar</span>
+        </button>
+        <button class="wedding-action-btn" onclick="navigateToVenue()">
+          <span class="action-icon">🗺️</span>
+          <span class="action-label">Get Directions</span>
+        </button>
+      </div>
+    </div>
   `;
 }
 

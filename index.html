@@ -3,30 +3,204 @@
 
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  
+  <!-- PWA Meta Tags -->
   <meta name="theme-color" content="#8B0000">
-  <meta name="description" content="Dharmesh & Neha Wedding App - 24-26 January 2026">
+  <meta name="background-color" content="#FFF8DC">
+  <meta name="description" content="Dharmesh & Neha Wedding App - Coordinate and celebrate with us! 24-26 January 2026 at Natraj Resort, Ahemdabad">
+  <meta name="keywords" content="wedding, Dharmesh, Neha, January 2026, wedding app, wedding coordinator">
+  <meta name="author" content="Dharmesh & Neha">
+  
+  <!-- iOS PWA Support -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="D&N Wedding">
+  <link rel="apple-touch-icon" href="public/icons/icon-192.svg">
+  <link rel="apple-touch-icon" sizes="152x152" href="public/icons/icon-192.svg">
+  <link rel="apple-touch-icon" sizes="180x180" href="public/icons/icon-192.svg">
+  <link rel="apple-touch-icon" sizes="167x167" href="public/icons/icon-192.svg">
+  
+  <!-- iOS Splash Screens (will show wedding theme color) -->
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  
+  <!-- Android/Chrome PWA -->
   <link rel="manifest" href="manifest.json">
-  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <meta name="mobile-web-app-capable" content="yes">
+  
+  <!-- Microsoft Tiles -->
+  <meta name="msapplication-TileColor" content="#8B0000">
+  <meta name="msapplication-tap-highlight" content="no">
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="public/icons/icon-192.svg">
+  <link rel="shortcut icon" href="public/icons/icon-192.svg">
+  
+  <!-- Open Graph / Social Sharing -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="💒 Dharmesh & Neha Wedding">
+  <meta property="og:description" content="Join us for our wedding celebration! 24-26 January 2026">
+  <meta property="og:image" content="public/icons/icon-512.svg">
+  <meta property="og:url" content="https://samratashoka007.github.io/wedding-app/">
+  
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="💒 Dharmesh & Neha Wedding">
+  <meta name="twitter:description" content="Join us for our wedding celebration! 24-26 January 2026">
+  
+  <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link
-    href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&family=Inter:wght@400;500;600&display=swap"
-    rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  
   <title>💒 Dharmesh & Neha Wedding</title>
-  <link rel="stylesheet" href="src/styles.css">
+  <link rel="stylesheet" href="src/styles.css?v=10">
   
   <!-- Firebase SDK for Real-time Sync -->
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+  
+  <!-- Inline critical styles for install banner -->
+  <style>
+    /* Install Banner */
+    .install-banner {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: linear-gradient(135deg, #8B0000 0%, #5d0000 100%);
+      color: white;
+      padding: 1rem;
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      z-index: 10000;
+      box-shadow: 0 -4px 20px rgba(0,0,0,0.3);
+      animation: slideUp 0.3s ease-out;
+    }
+    .install-banner.show { display: flex; }
+    @keyframes slideUp {
+      from { transform: translateY(100%); }
+      to { transform: translateY(0); }
+    }
+    .install-banner-content {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      flex: 1;
+    }
+    .install-banner-icon {
+      font-size: 2rem;
+    }
+    .install-banner-text h4 {
+      margin: 0;
+      font-size: 0.95rem;
+    }
+    .install-banner-text p {
+      margin: 0.25rem 0 0 0;
+      font-size: 0.8rem;
+      opacity: 0.9;
+    }
+    .install-btn {
+      background: white;
+      color: #8B0000;
+      border: none;
+      padding: 0.6rem 1.2rem;
+      border-radius: 25px;
+      font-weight: 600;
+      font-size: 0.85rem;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .install-close {
+      background: none;
+      border: none;
+      color: white;
+      font-size: 1.5rem;
+      cursor: pointer;
+      padding: 0.25rem;
+      opacity: 0.8;
+    }
+    
+    /* Offline Indicator */
+    .offline-indicator {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      background: #f44336;
+      color: white;
+      text-align: center;
+      padding: 0.5rem;
+      font-size: 0.85rem;
+      z-index: 10001;
+      display: none;
+    }
+    .offline-indicator.show { display: block; }
+    
+    /* Update Available */
+    .update-banner {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      background: linear-gradient(135deg, #4CAF50 0%, #2E7D32 100%);
+      color: white;
+      padding: 0.75rem 1rem;
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+      z-index: 10002;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+    }
+    .update-banner.show { display: flex; }
+    .update-banner button {
+      background: white;
+      color: #2E7D32;
+      border: none;
+      padding: 0.4rem 1rem;
+      border-radius: 20px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+  </style>
 </head>
 
 <body>
+  <!-- Offline Indicator -->
+  <div id="offlineIndicator" class="offline-indicator">
+    📡 You're offline - Some features may be limited
+  </div>
+  
+  <!-- Update Available Banner -->
+  <div id="updateBanner" class="update-banner">
+    <span>🎉 New update available!</span>
+    <button onclick="updateApp()">Update Now</button>
+  </div>
+  
+  <!-- Install Banner -->
+  <div id="installBanner" class="install-banner">
+    <div class="install-banner-content">
+      <span class="install-banner-icon">💒</span>
+      <div class="install-banner-text">
+        <h4>Install Wedding App</h4>
+        <p>Add to home screen for quick access</p>
+      </div>
+    </div>
+    <button class="install-btn" onclick="installApp()">Install</button>
+    <button class="install-close" onclick="dismissInstall()">×</button>
+  </div>
+  
+  <!-- Main App -->
   <div id="app"></div>
-  <script src="src/firebase-config.js?v=3"></script>
-  <script src="src/translations.js?v=9"></script>
-  <script src="src/data.js?v=9"></script>
-  <script src="src/app.js?v=9"></script>
+  
+  <!-- Scripts -->
+  <script src="src/firebase-config.js?v=4"></script>
+  <script src="src/translations.js?v=10"></script>
+  <script src="src/data.js?v=10"></script>
+  <script src="src/app.js?v=10"></script>
+  <script src="src/pwa.js?v=1"></script>
 </body>
 
 </html>

@@ -1,25 +1,75 @@
 {
     "name": "Dharmesh & Neha Wedding",
-    "short_name": "Wedding",
-    "description": "Wedding coordination app for 24-26 January 2026",
+    "short_name": "D&N Wedding",
+    "description": "Wedding coordination app for Dharmesh & Neha's wedding celebration - 24-26 January 2026 at Natraj Resort, Ahemdabad",
     "start_url": "./index.html",
     "scope": "./",
+    "id": "dharmesh-neha-wedding-app",
     "display": "standalone",
+    "display_override": ["standalone", "minimal-ui"],
     "background_color": "#FFF8DC",
     "theme_color": "#8B0000",
-    "orientation": "portrait",
+    "orientation": "portrait-primary",
+    "lang": "en",
+    "dir": "ltr",
+    "categories": ["lifestyle", "social"],
     "icons": [
         {
             "src": "./public/icons/icon-192.svg",
             "sizes": "192x192",
             "type": "image/svg+xml",
-            "purpose": "any maskable"
+            "purpose": "any"
         },
         {
             "src": "./public/icons/icon-512.svg",
             "sizes": "512x512",
             "type": "image/svg+xml",
-            "purpose": "any maskable"
+            "purpose": "any"
+        },
+        {
+            "src": "./public/icons/icon-192.svg",
+            "sizes": "192x192",
+            "type": "image/svg+xml",
+            "purpose": "maskable"
+        },
+        {
+            "src": "./public/icons/icon-512.svg",
+            "sizes": "512x512",
+            "type": "image/svg+xml",
+            "purpose": "maskable"
         }
-    ]
+    ],
+    "screenshots": [],
+    "shortcuts": [
+        {
+            "name": "My Tasks",
+            "short_name": "Tasks",
+            "description": "View your assigned tasks",
+            "url": "./index.html?tab=mytasks",
+            "icons": [{"src": "./public/icons/icon-192.svg", "sizes": "192x192"}]
+        },
+        {
+            "name": "Events Schedule",
+            "short_name": "Events",
+            "description": "View wedding schedule",
+            "url": "./index.html?tab=events",
+            "icons": [{"src": "./public/icons/icon-192.svg", "sizes": "192x192"}]
+        },
+        {
+            "name": "Call Vendors",
+            "short_name": "Vendors",
+            "description": "Contact vendors quickly",
+            "url": "./index.html?tab=vendors",
+            "icons": [{"src": "./public/icons/icon-192.svg", "sizes": "192x192"}]
+        }
+    ],
+    "related_applications": [],
+    "prefer_related_applications": false,
+    "launch_handler": {
+        "client_mode": "navigate-existing"
+    },
+    "handle_links": "preferred",
+    "edge_side_panel": {
+        "preferred_width": 400
+    }
 }
