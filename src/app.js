@@ -7,6 +7,55 @@ let completedTasks = [];
 let reminders = [];
 let currentLanguage = localStorage.getItem('weddingLang') || 'en';
 
+// ============================================
+// HELPER FUNCTIONS
+// ============================================
+
+// Get time ago string
+function getTimeAgo(timestamp) {
+  const seconds = Math.floor((Date.now() - timestamp) / 1000);
+  if (seconds < 60) return 'Just now';
+  const minutes = Math.floor(seconds / 60);
+  if (minutes < 60) return `${minutes}m ago`;
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return `${hours}h ago`;
+  const days = Math.floor(hours / 24);
+  return `${days}d ago`;
+}
+
+// Get wedding countdown
+function getWeddingCountdown() {
+  const weddingDate = new Date('2026-01-24T00:00:00+05:30');
+  const now = new Date();
+  const diff = weddingDate - now;
+  
+  if (diff <= 0) return { days: 0, hours: 0, minutes: 0, text: 'Wedding Day!' };
+  
+  const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+  const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+  const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+  
+  return { 
+    days, hours, minutes,
+    text: `${days}d ${hours}h ${minutes}m until wedding`
+  };
+}
+
+// Format due date
+function formatDueDate(dateStr) {
+  if (!dateStr) return 'No date';
+  const date = new Date(dateStr);
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const tomorrow = new Date(today);
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  
+  if (date < today) return `⚠️ Overdue (${date.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })})`;
+  if (date.toDateString() === today.toDateString()) return '📌 Today';
+  if (date.toDateString() === tomorrow.toDateString()) return '📅 Tomorrow';
+  return date.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
+}
+
 // Initialize App
 document.addEventListener('DOMContentLoaded', () => {
   initServiceWorker();
@@ -365,6 +414,11 @@ function toggleReminder(eventId) {
 function renderDashboard() {
   const app = document.getElementById('app');
   const roleLabel = t(currentUser.role);
+  const syncStatus = window.firebaseSync ? window.firebaseSync.getSyncStatus() : { isFirebaseConnected: false };
+  
+  // Get any announcements
+  const announcements = JSON.parse(localStorage.getItem('announcements') || '[]');
+  const latestAnnouncement = announcements.length > 0 ? announcements[0] : null;
 
   app.innerHTML = `
     <header class="app-header">
@@ -372,6 +426,10 @@ function renderDashboard() {
         <div class="header-top">
           <h1 class="header-title">💒 ${WEDDING_DATA.weddingInfo.groom} & ${WEDDING_DATA.weddingInfo.bride}</h1>
           <div class="header-actions">
+            <div id="syncStatusIndicator" class="sync-status-badge ${syncStatus.isFirebaseConnected ? 'sync-connected' : 'sync-offline'}">
+              <span class="sync-dot">${syncStatus.isFirebaseConnected ? '🟢' : '⚪'}</span>
+              <span class="sync-label">${syncStatus.isFirebaseConnected ? 'Live' : 'Offline'}</span>
+            </div>
             ${renderLanguageSwitcher()}
             <button class="logout-btn" onclick="logout()">${t('logout')}</button>
           </div>
@@ -381,6 +439,13 @@ function renderDashboard() {
           <span class="user-badge ${currentUser.role}">${roleLabel}</span>
         </p>
       </div>
+      ${latestAnnouncement ? `
+        <div class="announcement-banner ${latestAnnouncement.priority}">
+          <span class="announcement-icon">📢</span>
+          <span class="announcement-text">${latestAnnouncement.message}</span>
+          <span class="announcement-time">${getTimeAgo(latestAnnouncement.timestamp)}</span>
+        </div>
+      ` : ''}
     </header>
     
     <nav class="nav-tabs">
@@ -1468,36 +1533,117 @@ function renderAdminSettings() {
     
     <!-- Sync Status -->
     <div class="settings-section sync-status-section">
-      <h3>🔄 Sync Status</h3>
-      <div class="sync-status ${syncStatus.isFirebaseConnected ? 'connected' : 'offline'}">
-        <span class="sync-icon">${syncStatus.isFirebaseConnected ? '🟢' : '🟡'}</span>
-        <span class="sync-text">
-          ${syncStatus.isFirebaseConnected 
-            ? t('syncConnected') 
-            : syncStatus.isFirebaseConfigured 
-              ? 'Connecting...' 
-              : t('syncDisabled')}
-        </span>
+      <h3>🔄 Real-Time Sync Status</h3>
+      <div class="sync-status-card ${syncStatus.isFirebaseConnected ? 'connected' : 'offline'}">
+        <div class="sync-status-main">
+          <span class="sync-icon-large">${syncStatus.isFirebaseConnected ? '🟢' : '⚪'}</span>
+          <div class="sync-status-details">
+            <strong>${syncStatus.isFirebaseConnected ? 'Live Sync Active' : 'Offline Mode'}</strong>
+            <span class="sync-subtitle">
+              ${syncStatus.isFirebaseConnected 
+                ? 'All changes sync instantly across all devices' 
+                : 'Changes are saved locally only'}
+            </span>
+          </div>
+        </div>
+        ${syncStatus.isFirebaseConnected ? `
+          <div class="sync-features">
+            <span class="sync-feature">✓ Task completion syncs</span>
+            <span class="sync-feature">✓ Custom tasks sync</span>
+            <span class="sync-feature">✓ Announcements work</span>
+          </div>
+        ` : ''}
       </div>
+      
       ${!syncStatus.isFirebaseConfigured ? `
-        <div class="firebase-setup-info">
-          <p style="color:#856404;background:#fff3cd;padding:12px;border-radius:8px;margin-top:1rem;font-size:0.85rem;">
-            <strong>⚠️ ${t('firebaseSetupTitle')}</strong><br>
-            ${t('firebaseSetupDesc')}<br><br>
-            <strong>${t('firebaseSetupSteps')}:</strong><br>
-            1. Go to <a href="https://console.firebase.google.com/" target="_blank">Firebase Console</a><br>
-            2. Create a project (free)<br>
-            3. Enable Realtime Database<br>
-            4. Update firebase-config.js with your keys<br>
-          </p>
+        <div class="firebase-setup-wizard">
+          <div class="setup-header">
+            <span class="setup-icon">🔥</span>
+            <div>
+              <strong>Enable Real-Time Sync (5 minutes)</strong>
+              <p>Allow all coordinators to see changes instantly on any device</p>
+            </div>
+          </div>
+          <div class="setup-steps">
+            <div class="setup-step">
+              <span class="step-number">1</span>
+              <div class="step-content">
+                <strong>Create Firebase Project</strong>
+                <p>Go to <a href="https://console.firebase.google.com/" target="_blank" class="link-btn">Firebase Console ↗</a></p>
+              </div>
+            </div>
+            <div class="setup-step">
+              <span class="step-number">2</span>
+              <div class="step-content">
+                <strong>Create Project</strong>
+                <p>Click "Create a project" → Name it → Disable Analytics → Create</p>
+              </div>
+            </div>
+            <div class="setup-step">
+              <span class="step-number">3</span>
+              <div class="step-content">
+                <strong>Add Web App</strong>
+                <p>Click web icon <code>&lt;/&gt;</code> → Register as "wedding-app"</p>
+              </div>
+            </div>
+            <div class="setup-step">
+              <span class="step-number">4</span>
+              <div class="step-content">
+                <strong>Enable Database</strong>
+                <p>Build → Realtime Database → Create → Test Mode → Enable</p>
+              </div>
+            </div>
+            <div class="setup-step">
+              <span class="step-number">5</span>
+              <div class="step-content">
+                <strong>Copy Config</strong>
+                <p>Copy config keys to <code>src/firebase-config.js</code></p>
+              </div>
+            </div>
+          </div>
+          <button class="settings-btn primary" onclick="window.open('https://console.firebase.google.com/', '_blank')">
+            🚀 Start Firebase Setup
+          </button>
         </div>
       ` : `
-        <div class="sync-info" style="background:#d4edda;padding:12px;border-radius:8px;margin-top:1rem;font-size:0.85rem;">
-          <strong>✅ Real-time sync is active!</strong><br>
-          All task completions will sync across all devices automatically.
+        <div class="sync-connected-info">
+          <div class="sync-success-badge">
+            <span>✅</span> Firebase Connected
+          </div>
+          <div class="sync-actions">
+            <button class="settings-btn small" onclick="pushDataToFirebase()">
+              📤 Push All Data to Cloud
+            </button>
+            <button class="settings-btn small" onclick="pullDataFromFirebase()">
+              📥 Pull Data from Cloud
+            </button>
+          </div>
         </div>
       `}
     </div>
+    
+    <!-- Announcements (Only visible when Firebase is connected) -->
+    ${syncStatus.isFirebaseConnected ? `
+    <div class="settings-section">
+      <h3>📢 Send Announcement</h3>
+      <p style="color:#666;font-size:0.85rem;margin-bottom:1rem;">
+        Send a live message to all coordinators and guests instantly!
+      </p>
+      <div class="announcement-form">
+        <textarea id="announcementText" placeholder="Type your announcement..." rows="2" style="width:100%;padding:0.75rem;border:1px solid #ddd;border-radius:8px;font-size:0.9rem;resize:none;"></textarea>
+        <div class="announcement-actions" style="margin-top:0.5rem;display:flex;gap:0.5rem;">
+          <select id="announcementPriority" style="padding:0.5rem;border:1px solid #ddd;border-radius:6px;">
+            <option value="normal">📝 Normal</option>
+            <option value="important">⚡ Important</option>
+            <option value="urgent">🚨 Urgent</option>
+          </select>
+          <button class="settings-btn success" onclick="sendAnnouncement()" style="flex:1;">
+            📤 Send to Everyone
+          </button>
+        </div>
+      </div>
+    </div>
+    ` : ''}
     
     <!-- Custom Tasks (Admin can add new tasks) -->
     <div class="settings-section">
@@ -1977,6 +2123,64 @@ window.showAddTaskForm = showAddTaskForm;
 window.hideAddTaskForm = hideAddTaskForm;
 window.saveCustomTask = saveCustomTask;
 window.deleteCustomTaskById = deleteCustomTaskById;
+window.sendAnnouncement = sendAnnouncement;
+window.pushDataToFirebase = pushDataToFirebase;
+window.pullDataFromFirebase = pullDataFromFirebase;
+
+// Send announcement to all users
+function sendAnnouncement() {
+  const text = document.getElementById('announcementText').value.trim();
+  const priority = document.getElementById('announcementPriority').value;
+  
+  if (!text) {
+    alert('Please enter an announcement message');
+    return;
+  }
+  
+  if (window.firebaseSync && window.firebaseSync.sendAnnouncement) {
+    window.firebaseSync.sendAnnouncement(text, priority);
+    document.getElementById('announcementText').value = '';
+    alert('📢 Announcement sent to all users!');
+    
+    // Log activity
+    if (window.firebaseSync.logActivity) {
+      window.firebaseSync.logActivity('announcement', { message: text, priority });
+    }
+  } else {
+    alert('Firebase not connected. Announcements require real-time sync.');
+  }
+}
+
+// Push all local data to Firebase
+function pushDataToFirebase() {
+  if (!confirm('This will upload all events, guests, and tasks to Firebase. Continue?')) return;
+  
+  if (window.firebaseSync && window.firebaseSync.pushAllDataToFirebase) {
+    window.firebaseSync.pushAllDataToFirebase().then(success => {
+      if (success) {
+        alert('✅ All data pushed to Firebase successfully!');
+      } else {
+        alert('❌ Failed to push data. Check console for errors.');
+      }
+    });
+  }
+}
+
+// Pull data from Firebase to local
+function pullDataFromFirebase() {
+  if (!confirm('This will download the latest data from Firebase. Local changes may be overwritten. Continue?')) return;
+  
+  if (window.firebaseSync && window.firebaseSync.initializeFromFirebase) {
+    window.firebaseSync.initializeFromFirebase().then(success => {
+      if (success) {
+        alert('✅ Data synced from Firebase!');
+        renderApp();
+      } else {
+        alert('❌ Failed to pull data. Check console for errors.');
+      }
+    });
+  }
+}
 
 function editEventForm(eventId) {
   const events = getEditableEvents();
