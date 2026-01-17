@@ -539,7 +539,9 @@ function renderMyTasks() {
   });
 
   // Get ALL tasks assigned to this coordinator across all days
+  console.log('🔍 Coordinator name:', coord.name);
   const myTasks = getCoordinatorAllTasks(coord.name);
+  console.log('📋 Tasks found:', myTasks.length, myTasks);
   
   // Group tasks by day
   const tasksByDay = {
