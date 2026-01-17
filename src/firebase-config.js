@@ -18,15 +18,15 @@
 // ============================================
 
 const firebaseConfig = {
-    // ⬇️ PASTE YOUR FIREBASE CONFIG HERE ⬇️
-    apiKey: "YOUR_API_KEY",
-    authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-    databaseURL: "https://YOUR_PROJECT_ID-default-rtdb.firebaseio.com",
-    projectId: "YOUR_PROJECT_ID",
-    storageBucket: "YOUR_PROJECT_ID.appspot.com",
-    messagingSenderId: "YOUR_SENDER_ID",
-    appId: "YOUR_APP_ID"
-    // ⬆️ PASTE YOUR FIREBASE CONFIG HERE ⬆️
+    // ✅ CONFIGURED FOR WEDDING-APP-SYNC
+    apiKey: "AIzaSyDxH4Nx7iuAKT6VE3Qa7K3VDlzqWcRIokE",
+    authDomain: "wedding-app-sync-ddad6.firebaseapp.com",
+    databaseURL: "https://wedding-app-sync-ddad6-default-rtdb.firebaseio.com",
+    projectId: "wedding-app-sync-ddad6",
+    storageBucket: "wedding-app-sync-ddad6.firebasestorage.app",
+    messagingSenderId: "920722706225",
+    appId: "1:920722706225:web:7a9361e656f3d5921a6a10",
+    measurementId: "G-49QED6W7ZQ"
 };
 
 // ============================================
