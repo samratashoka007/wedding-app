@@ -397,27 +397,27 @@ function getNavTabs() {
     return `
       <button class="nav-tab ${currentTab === 'dashboard' ? 'active' : ''}" data-tab="dashboard">
         <span>🏠</span>
-        <span>Dashboard</span>
+        <span>${t('dashboard')}</span>
       </button>
       <button class="nav-tab ${currentTab === 'events' ? 'active' : ''}" data-tab="events">
         <span>📅</span>
-        <span>Events</span>
+        <span>${t('events')}</span>
       </button>
       <button class="nav-tab ${currentTab === 'guests' ? 'active' : ''}" data-tab="guests">
         <span>👤</span>
-        <span>Guests</span>
+        <span>${t('guests')}</span>
       </button>
       <button class="nav-tab ${currentTab === 'tasks' ? 'active' : ''}" data-tab="tasks">
         <span>✅</span>
-        <span>Tasks</span>
+        <span>${t('tasks')}</span>
       </button>
       <button class="nav-tab ${currentTab === 'vendors' ? 'active' : ''}" data-tab="vendors">
         <span>📞</span>
-        <span>Vendors</span>
+        <span>${t('vendors')}</span>
       </button>
       <button class="nav-tab ${currentTab === 'settings' ? 'active' : ''}" data-tab="settings">
         <span>⚙️</span>
-        <span>Settings</span>
+        <span>${t('settings')}</span>
       </button>
   `;
   } else if (currentUser.role === 'coordinator') {
@@ -436,7 +436,7 @@ function getNavTabs() {
       </button>
       <button class="nav-tab ${currentTab === 'guests' ? 'active' : ''}" data-tab="guests">
         <span>👤</span>
-        <span>Guests</span>
+        <span>${t('guests')}</span>
       </button>
       <button class="nav-tab ${currentTab === 'vendors' ? 'active' : ''}" data-tab="vendors">
         <span>📞</span>
@@ -516,7 +516,7 @@ function getTabContent() {
 // Render My Tasks (Coordinator Only) - TIME AWARE
 function renderMyTasks() {
   const coord = currentUser.coordinator;
-  if (!coord) return '<div class="empty-state"><span>🤔</span>No tasks assigned</div>';
+  if (!coord) return `<div class="empty-state"><span>🤔</span>${t('noTasksAssigned')}</div>`;
 
   const countdown = getWeddingCountdown();
   const phase = getWeddingPhase();
@@ -551,16 +551,16 @@ function renderMyTasks() {
     
     <div class="section-header">
       <span class="emoji">👋</span>
-      <h2>Hello, ${coord.name.split(' ')[0]}!</h2>
+      <h2>${t('hello')}, ${coord.name.split(' ')[0]}!</h2>
     </div>
     
     <div class="phase-indicator">
-      <span class="phase-label">Current Phase:</span>
-      <span class="phase-badge ${phase}">${phase === 'pre-wedding' ? '📋 Pre-Wedding Prep' :
-      phase === 'day1' ? '🌻 Day 1 - Haldi/Sangeet' :
-        phase === 'day2' ? '💒 Day 2 - Wedding' :
-          phase === 'day3' ? '🎉 Day 3 - Reception' :
-            '✅ Complete'
+      <span class="phase-label">${t('currentPhase')}:</span>
+      <span class="phase-badge ${phase}">${phase === 'pre-wedding' ? '📋 ' + t('preWeddingPrep') :
+      phase === 'day1' ? '🌻 ' + t('haldiSangeet') :
+        phase === 'day2' ? '💒 ' + t('weddingDay') :
+          phase === 'day3' ? '🎉 ' + t('reception') :
+            '✅ ' + t('complete')
     }</span>
     </div>
     
@@ -578,25 +578,25 @@ function renderMyTasks() {
     </div>
     
     <div class="quick-actions">
-      <h3>⚡ Quick Actions</h3>
+      <h3>⚡ ${t('quickActions')}</h3>
       <div class="action-buttons">
-        <button class="action-btn" onclick="switchTab('vendors')">📞 Call Vendors</button>
-        <button class="action-btn" onclick="switchTab('team')">👥 View Team</button>
-        <button class="action-btn" onclick="switchTab('events')">📅 Full Schedule</button>
-        <button class="action-btn" onclick="switchTab('guests')">👤 Guest List</button>
+        <button class="action-btn" onclick="switchTab('vendors')">📞 ${t('callVendors')}</button>
+        <button class="action-btn" onclick="switchTab('team')">👥 ${t('viewTeam')}</button>
+        <button class="action-btn" onclick="switchTab('events')">📅 ${t('fullSchedule')}</button>
+        <button class="action-btn" onclick="switchTab('guests')">👤 ${t('guestList')}</button>
       </div>
     </div>
     
     <div class="escalation-card">
-      <h3>🚨 Escalation Contacts</h3>
-      <div class="escalation-item"><strong>Payment/Scope:</strong> ${WEDDING_DATA.escalation.payment}</div>
-      <div class="escalation-item"><strong>General:</strong> ${WEDDING_DATA.escalation.general}</div>
-      <div class="escalation-item"><strong>Resort (24-25):</strong> ${WEDDING_DATA.escalation.resort24_25}</div>
-      <div class="escalation-item"><strong>Banquet (26):</strong> ${WEDDING_DATA.escalation.banquet26}</div>
+      <h3>🚨 ${t('escalationContacts')}</h3>
+      <div class="escalation-item"><strong>${t('paymentScope')}:</strong> ${WEDDING_DATA.escalation.payment}</div>
+      <div class="escalation-item"><strong>${t('general')}:</strong> ${WEDDING_DATA.escalation.general}</div>
+      <div class="escalation-item"><strong>${t('resort')}:</strong> ${WEDDING_DATA.escalation.resort24_25}</div>
+      <div class="escalation-item"><strong>${t('banquet')}:</strong> ${WEDDING_DATA.escalation.banquet26}</div>
     </div>
     
     <div class="rules-card">
-      <h3>📜 Important Rules</h3>
+      <h3>📜 ${t('importantRules')}</h3>
       <ul>
         ${WEDDING_DATA.rules.map(rule => `<li>${rule}</li>`).join('')}
       </ul>
@@ -619,36 +619,36 @@ function renderPreWeddingTasks(tasks, coord) {
 
   return `
     <div class="my-tasks">
-      <h3>📋 Pre-Wedding Tasks (${tasks.length - completed.length} pending)</h3>
+      <h3>📋 ${t('preWeddingTasks')} (${tasks.length - completed.length} ${t('pending')})</h3>
       
       ${overdue.length> 0 ? `
         <div class="task-group overdue">
-          <h4>⚠️ Overdue</h4>
-          ${overdue.map(t => renderPreWeddingTaskItem(t)).join('')}
+          <h4>⚠️ ${t('overdue')}</h4>
+          ${overdue.map(task => renderPreWeddingTaskItem(task)).join('')}
         </div>
       ` : ''
     }
       
       ${dueToday.length> 0 ? `
         <div class="task-group today">
-          <h4>📌 Due Today</h4>
-          ${dueToday.map(t => renderPreWeddingTaskItem(t)).join('')}
+          <h4>📌 ${t('dueToday')}</h4>
+          ${dueToday.map(task => renderPreWeddingTaskItem(task)).join('')}
         </div>
       ` : ''
     }
       
       ${upcoming.length> 0 ? `
         <div class="task-group upcoming">
-          <h4>📅 Upcoming</h4>
-          ${upcoming.map(t => renderPreWeddingTaskItem(t)).join('')}
+          <h4>📅 ${t('upcoming')}</h4>
+          ${upcoming.map(task => renderPreWeddingTaskItem(task)).join('')}
         </div>
       ` : ''
     }
       
       ${completed.length> 0 ? `
         <div class="task-group completed">
-          <h4>✅ Completed (${completed.length})</h4>
-          ${completed.map(t => renderPreWeddingTaskItem(t, true)).join('')}
+          <h4>✅ ${t('completed')} (${completed.length})</h4>
+          ${completed.map(task => renderPreWeddingTaskItem(task, true)).join('')}
         </div>
       ` : ''
     }
@@ -656,20 +656,20 @@ function renderPreWeddingTasks(tasks, coord) {
       ${tasks.length === 0 ? `
         <div class="empty-state small">
           <span>✨</span>
-          <p>No pre-wedding tasks assigned to you!</p>
+          <p>${t('noTasksAssigned')}</p>
         </div>
       ` : ''
     }
     </div>
 
     <div class="all-prewedding-tasks">
-      <h3>📋 All Team Pre-Wedding Tasks</h3>
-      <p style="color:#666;font-size:0.85rem;margin-bottom:0.75rem;">Overview of all coordinator tasks before wedding</p>
-      ${PRE_WEDDING_TASKS.map(t => `
-        <div class="mini-task ${t.priority} ${completedTasks.includes(t.task) ? 'done' : ''}">
-          <span class="mini-task-date">${formatDueDate(t.dueDate)}</span>
-          <span class="mini-task-text">${t.task}</span>
-          <span class="mini-task-assignee">${t.assignee}</span>
+      <h3>📋 ${t('allTeamTasks')}</h3>
+      <p style="color:#666;font-size:0.85rem;margin-bottom:0.75rem;">${t('overview')} - ${t('beforeWedding')}</p>
+      ${PRE_WEDDING_TASKS.map(task => `
+        <div class="mini-task ${task.priority} ${completedTasks.includes(task.task) ? 'done' : ''}">
+          <span class="mini-task-date">${formatDueDate(task.dueDate)}</span>
+          <span class="mini-task-text">${task.task}</span>
+          <span class="mini-task-assignee">${task.assignee}</span>
         </div>
       `).join('')}
     </div>
@@ -705,39 +705,39 @@ function renderDayTasks(tasks, phase, coord) {
 
   return `
     <div class="day-selector">
-      <button class="day-btn ${phase === 'day1' ? 'active' : ''}" onclick="previewDay('24')">Day 1 (24th)</button>
-      <button class="day-btn ${phase === 'day2' ? 'active' : ''}" onclick="previewDay('25')">Day 2 (25th)</button>
-      <button class="day-btn ${phase === 'day3' ? 'active' : ''}" onclick="previewDay('26')">Day 3 (26th)</button>
+      <button class="day-btn ${phase === 'day1' ? 'active' : ''}" onclick="previewDay('24')">${t('day1')} (24th)</button>
+      <button class="day-btn ${phase === 'day2' ? 'active' : ''}" onclick="previewDay('25')">${t('day2')} (25th)</button>
+      <button class="day-btn ${phase === 'day3' ? 'active' : ''}" onclick="previewDay('26')">${t('day3')} (26th)</button>
     </div>
     
     <div class="my-tasks">
-      <h3>🕐 Your Tasks for Day ${dayNum} (${tasks.length} tasks)</h3>
+      <h3>🕐 ${t('yourTasksForDay')} ${dayNum} (${tasks.length} ${t('tasksLabel')})</h3>
       
-      ${tasks.length> 0 ? tasks.map(t => `
-        <div class="task-item day-task ${completedTasks.includes(t.task) ? 'done' : ''}">
-          <div class="task-checkbox ${completedTasks.includes(t.task) ? 'checked' : ''}" 
-               onclick="toggleTask('${t.task.replace(/'/g, "\\'")}')"></div>
+      ${tasks.length> 0 ? tasks.map(task => `
+        <div class="task-item day-task ${completedTasks.includes(task.task) ? 'done' : ''}">
+          <div class="task-checkbox ${completedTasks.includes(task.task) ? 'checked' : ''}" 
+               onclick="toggleTask('${task.task.replace(/'/g, "\\'")}')"></div>
           <div class="task-content">
-            <span class="task-time">${t.time}</span>
-            <span class="task-text ${completedTasks.includes(t.task) ? 'done' : ''}">${t.task}</span>
+            <span class="task-time">${task.time}</span>
+            <span class="task-text ${completedTasks.includes(task.task) ? 'done' : ''}">${task.task}</span>
           </div>
         </div>
       `).join('') : `
         <div class="empty-state small">
           <span>✨</span>
-          <p>No tasks assigned for this day!</p>
+          <p>${t('noTasksAssigned')}</p>
         </div>
       `}
     </div>
     
     <div class="all-day-tasks">
-      <h3>📋 Full Day ${dayNum} Timeline</h3>
-      <p style="color:#666;font-size:0.85rem;margin-bottom:0.75rem;">All team tasks for this day</p>
-      ${allDayTasks.map(t => `
-        <div class="timeline-task ${completedTasks.includes(t.task) ? 'done' : ''}">
-          <span class="timeline-time">${t.time}</span>
-          <span class="timeline-text">${t.task}</span>
-          <span class="timeline-assignee">${t.assignee}</span>
+      <h3>📋 ${t('fullDayTimeline')}</h3>
+      <p style="color:#666;font-size:0.85rem;margin-bottom:0.75rem;">${t('allTeamTasks')}</p>
+      ${allDayTasks.map(task => `
+        <div class="timeline-task ${completedTasks.includes(task.task) ? 'done' : ''}">
+          <span class="timeline-time">${task.time}</span>
+          <span class="timeline-text">${task.task}</span>
+          <span class="timeline-assignee">${task.assignee}</span>
         </div>
       `).join('')}
     </div>
@@ -880,7 +880,7 @@ function renderTravelTab() {
       </div>
       <div class="travel-time">
         <span class="time-badge">${BUS_TRAVEL.pickup.time}</span>
-        <span class="arrival-info">→ Arrival: ${BUS_TRAVEL.pickup.arrivalAtResort}</span>
+        <span class="arrival-info">→ ${t('arrivalTime')}: ${BUS_TRAVEL.pickup.arrivalAtResort}</span>
       </div>
       <p class="travel-desc">${BUS_TRAVEL.pickup.description[lang] || BUS_TRAVEL.pickup.description.en}</p>
       <div class="travel-details">
@@ -908,11 +908,7 @@ function renderTravelTab() {
     </div>
     
     <div class="travel-note">
-      <p>⚠️ ${currentLanguage === 'hi' ?
-      'कृपया समय पर पिकअप पॉइंट पर पहुंचें। बस इंतजार नहीं करेगी।' :
-      currentLanguage === 'gu' ?
-        'કૃપયા સમયસર પિકઅપ પોઇન્ટ પર પહોંચો. બસ રાહ જોશે નહીં.' :
-        'Please arrive at the pickup point on time. The bus will not wait.'}</p>
+      <p>⚠️ ${t('arriveOnTime')}</p>
     </div>
   `;
 }
@@ -930,15 +926,9 @@ function renderMyRoomTab() {
 
     <div class="empty-state">
       <span>🔍</span>
-      <p>${currentLanguage === 'hi' ?
-        'आपके नाम के लिए कोई कमरा आवंटित नहीं मिला।' :
-        currentLanguage === 'gu' ?
-          'તમારા નામ માટે કોઈ રૂમ ફાળવેલ નથી.' :
-          'No room assignment found for your name.'}</p>
+      <p>${t('noRoomAssignment')}</p>
       <p style="font-size:0.85rem;margin-top:0.5rem;color:#666;">
-        ${currentLanguage === 'hi' ? 'कृपया कोऑर्डिनेटर से संपर्क करें।' :
-        currentLanguage === 'gu' ? 'કૃપયા કોઓર્ડિનેટરનો સંપર્ક કરો.' :
-          'Please contact a coordinator.'}
+        ${t('pleaseContactCoordinator')}
       </p>
     </div>
   `;
@@ -964,22 +954,14 @@ function renderMyRoomTab() {
         <span class="detail-value">${guestInfo.count} ${t('guests')}</span>
       </div>
       <div class="room-detail-item">
-        <span class="detail-label">📍 ${currentLanguage === 'hi' ? 'स्थान' : currentLanguage === 'gu' ? 'સ્થળ' : 'Location'}</span>
+        <span class="detail-label">📍 ${t('location')}</span>
         <span class="detail-value">Natraj Resort</span>
       </div>
     </div>
     
     <div class="room-note">
-      <p>📌 ${currentLanguage === 'hi' ?
-      'चेक-इन: 24 जनवरी, दोपहर 12 बजे के बाद' :
-      currentLanguage === 'gu' ?
-        'ચેક-ઇન: 24 જાન્યુઆરી, બપોરે 12 વાગ્યા પછી' :
-        'Check-in: 24 January, after 12 PM'}</p>
-      <p>📌 ${currentLanguage === 'hi' ?
-      'चेक-आउट: 26 जनवरी, सुबह 10:30 बजे तक' :
-      currentLanguage === 'gu' ?
-        'ચેક-આઉટ: 26 જાન્યુઆરી, સવારે 10:30 વાગ્યા સુધી' :
-        'Check-out: 26 January, by 10:30 AM'}</p>
+      <p>📌 ${t('checkIn')}: 24 January, ${t('after')} 12 PM</p>
+      <p>📌 ${t('checkOut')}: 26 January, ${t('by')} 10:30 AM</p>
     </div>
   `;
 }
@@ -1077,17 +1059,17 @@ function renderGuestListTab() {
   return `
     <div class="section-header">
       <span class="emoji">👤</span>
-      <h2>Guest List</h2>
+      <h2>${t('guestList')}</h2>
     </div>
     
     <div class="guest-summary">
       <div class="summary-item">
         <span class="summary-number">${GUEST_LIST.length}</span>
-        <span class="summary-label">Families/Groups</span>
+        <span class="summary-label">${t('familiesGroups')}</span>
       </div>
       <div class="summary-item">
         <span class="summary-number">${totalGuests}</span>
-        <span class="summary-label">Total Guests</span>
+        <span class="summary-label">${t('totalGuestsLabel')}</span>
       </div>
     </div>
     
@@ -1096,7 +1078,7 @@ function renderGuestListTab() {
         <div class="guest-card">
           <div class="guest-main">
             <div class="guest-name">${guest.name}</div>
-            <div class="guest-count">${guest.count} pax</div>
+            <div class="guest-count">${guest.count} ${t('pax')}</div>
           </div>
           <div class="guest-details">
             <div class="guest-room">
@@ -1157,8 +1139,8 @@ function renderAdminDashboard() {
   return `
     <div class="admin-header">
       <span class="admin-crown">👑</span>
-      <h2>Welcome, ${currentUser.name}!</h2>
-      <p class="admin-subtitle">You have full admin access</p>
+      <h2>${t('welcome')}, ${currentUser.name}!</h2>
+      <p class="admin-subtitle">${t('fullAdminAccess')}</p>
     </div>
     
     <div class="countdown-banner ${countdown.isWeddingDay ? 'wedding-day' : ''}">
@@ -1170,35 +1152,35 @@ function renderAdminDashboard() {
     <div class="admin-stats">
       <div class="stat-card">
         <span class="stat-number">${events.length}</span>
-        <span class="stat-label">Events</span>
+        <span class="stat-label">${t('events')}</span>
       </div>
       <div class="stat-card">
         <span class="stat-number">${guests.length}</span>
-        <span class="stat-label">Families</span>
+        <span class="stat-label">${t('families')}</span>
       </div>
       <div class="stat-card">
         <span class="stat-number">${totalGuests}</span>
-        <span class="stat-label">Total Guests</span>
+        <span class="stat-label">${t('totalGuestsLabel')}</span>
       </div>
       <div class="stat-card">
         <span class="stat-number">${WEDDING_DATA.coordinators.length}</span>
-        <span class="stat-label">Coordinators</span>
+        <span class="stat-label">${t('coordinators')}</span>
       </div>
     </div>
     
     <div class="admin-quick-actions">
-      <h3>⚡ Quick Actions</h3>
+      <h3>⚡ ${t('quickActions')}</h3>
       <div class="admin-action-grid">
-        <button class="admin-action-btn" onclick="switchTab('events')">➕ Add Event</button>
-        <button class="admin-action-btn" onclick="switchTab('guests')">👤 Add Guest</button>
-        <button class="admin-action-btn" onclick="switchTab('tasks')">✅ Assign Task</button>
-        <button class="admin-action-btn" onclick="switchTab('vendors')">📞 View Vendors</button>
+        <button class="admin-action-btn" onclick="switchTab('events')">➕ ${t('addEvent')}</button>
+        <button class="admin-action-btn" onclick="switchTab('guests')">👤 ${t('addGuest')}</button>
+        <button class="admin-action-btn" onclick="switchTab('tasks')">✅ ${t('addTask')}</button>
+        <button class="admin-action-btn" onclick="switchTab('vendors')">📞 ${t('viewVendors')}</button>
       </div>
     </div>
     
     <div class="admin-section">
-      <h3>📋 Recent Activity</h3>
-      <p style="color:#666;font-size:0.85rem;">All changes are saved locally on this device</p>
+      <h3>📋 ${t('recentActivity')}</h3>
+      <p style="color:#666;font-size:0.85rem;">${t('allChangesSavedLocally')}</p>
     </div>
   `;
 }
@@ -1215,10 +1197,10 @@ function renderAdminEvents() {
   return `
     <div class="section-header">
       <span class="emoji">📅</span>
-      <h2>Manage Events</h2>
+      <h2>${t('manageEventsTitle')}</h2>
     </div>
     
-    <button class="add-btn" onclick="showAddEventForm()">➕ Add New Event</button>
+    <button class="add-btn" onclick="showAddEventForm()">➕ ${t('addNewEvent')}</button>
     
     <div id="eventFormContainer"></div>
     
@@ -1231,7 +1213,7 @@ function renderAdminEvents() {
           <div class="event-main">
             <span class="event-emoji">${event.emoji}</span>
             <div class="event-info">
-              <strong>${event.name}</strong>
+              <strong>${getEventName(event.name)}</strong>
               <span class="event-time">${event.time} • ${event.venue}</span>
             </div>
           </div>
@@ -1254,10 +1236,10 @@ function renderAdminGuests() {
   return `
     <div class="section-header">
       <span class="emoji">👤</span>
-      <h2>Manage Guests (${totalGuests} total)</h2>
+      <h2>${t('manageGuestsTitle')} (${totalGuests} ${t('total')})</h2>
     </div>
     
-    <button class="add-btn" onclick="showAddGuestForm()">➕ Add Guest</button>
+    <button class="add-btn" onclick="showAddGuestForm()">➕ ${t('addGuest')}</button>
     
     <div id="guestFormContainer"></div>
     
@@ -1266,7 +1248,7 @@ function renderAdminGuests() {
         <div class="guest-main">
           <div class="guest-info">
             <strong>${guest.name}</strong>
-            <span class="guest-count-badge">${guest.count || 1} pax</span>
+            <span class="guest-count-badge">${guest.count || 1} ${t('pax')}</span>
           </div>
           ${guest.room ? `<span class="guest-room-badge">🏨 ${guest.room}</span>` : ''}
         </div>
@@ -1285,14 +1267,14 @@ function renderAdminTasks() {
   return `
     <div class="section-header">
       <span class="emoji">✅</span>
-      <h2>Manage Tasks</h2>
+      <h2>${t('manageTasksTitle')}</h2>
     </div>
     
-    <button class="add-btn" onclick="showAddTaskForm()">➕ Add Task</button>
+    <button class="add-btn" onclick="showAddTaskForm()">➕ ${t('addTask')}</button>
     
     <div id="taskFormContainer"></div>
     
-    <h3 style="margin:1rem 0 0.5rem;">Pre-Wedding Tasks</h3>
+    <h3 style="margin:1rem 0 0.5rem;">${t('preWeddingTasks')}</h3>
     ${editableData.preWeddingTasks.map(task => `
       <div class="admin-task-card">
         <div class="task-main">
@@ -1309,8 +1291,8 @@ function renderAdminTasks() {
     `).join('')
     }
     
-    <h3 style="margin:1.5rem 0 0.5rem;">Wedding Day Tasks</h3>
-    <p style="color:#666;font-size:0.85rem;">Day 1: ${DAY_TASKS['24'].length} tasks | Day 2: ${DAY_TASKS['25'].length} tasks | Day 3: ${DAY_TASKS['26'].length} tasks</p>
+    <h3 style="margin:1.5rem 0 0.5rem;">${t('weddingDayTasks')}</h3>
+    <p style="color:#666;font-size:0.85rem;">${t('day1')}: ${DAY_TASKS['24'].length} ${t('tasksLabel')} | ${t('day2')}: ${DAY_TASKS['25'].length} ${t('tasksLabel')} | ${t('day3')}: ${DAY_TASKS['26'].length} ${t('tasksLabel')}</p>
   `;
 }
 
@@ -1319,7 +1301,7 @@ function renderAdminVendors() {
   return `
     <div class="section-header">
       <span class="emoji">📞</span>
-      <h2>Vendor Directory</h2>
+      <h2>${t('vendorDirectory')}</h2>
     </div>
 
     ${WEDDING_DATA.vendors.map(vendor => `
@@ -1332,7 +1314,7 @@ function renderAdminVendors() {
           <span>${vendor.contact}</span>
           <a href="tel:${vendor.phone}" class="call-btn-small">📞 ${vendor.phone}</a>
         </div>
-        <div class="vendor-poc">POC: ${vendor.poc}</div>
+        <div class="vendor-poc">${t('poc')}: ${vendor.poc}</div>
       </div>
     `).join('')
     }
@@ -1347,14 +1329,14 @@ function renderAdminSettings() {
   return `
     <div class="section-header">
       <span class="emoji">⚙️</span>
-      <h2>Settings</h2>
+      <h2>${t('settings')}</h2>
     </div>
     
-    < !--Coordinator OTP Management-->
+    <!--Coordinator OTP Management-->
     <div class="settings-section">
-      <h3>🎯 Coordinator Access Codes</h3>
+      <h3>🎯 ${t('coordinatorAccessCodes')}</h3>
       <p style="color:#666;font-size:0.85rem;margin-bottom:1rem;">
-        Manage 4-digit OTPs for coordinator login. Share these codes securely with your coordinators.
+        ${t('manageOTPDesc')}
       </p>
       
       <div class="coordinator-otp-list">
@@ -1364,15 +1346,15 @@ function renderAdminSettings() {
               <div class="coord-avatar">${coord.name.charAt(0)}</div>
               <div class="coord-details">
                 <strong>${coord.name}</strong>
-                <span class="coord-role">${coord.role || 'Coordinator'}</span>
+                <span class="coord-role">${coord.role || t('coordinator')}</span>
                 ${coord.isCustom ? '<span class="custom-badge">Custom</span>' : ''}
               </div>
             </div>
             <div class="coord-otp">
               <span class="otp-display" id="otp-${coord.id || coord.name}">${otps[coord.name] || '----'}</span>
-              <button class="otp-btn" onclick="regenerateOTP('${coord.name}')" title="Generate New OTP">🔄</button>
-              <button class="otp-btn" onclick="editOTP('${coord.name}')" title="Edit OTP">✏️</button>
-              ${coord.isCustom ? `<button class="otp-btn danger" onclick="removeCoordinator(${coord.id})" title="Remove">🗑️</button>` : ''}
+              <button class="otp-btn" onclick="regenerateOTP('${coord.name}')" title="${t('generateNewOTP')}">🔄</button>
+              <button class="otp-btn" onclick="editOTP('${coord.name}')" title="${t('editOTP')}">✏️</button>
+              ${coord.isCustom ? `<button class="otp-btn danger" onclick="removeCoordinator(${coord.id})" title="${t('remove')}">🗑️</button>` : ''}
             </div>
           </div>
         `).join('')}
@@ -1381,54 +1363,54 @@ function renderAdminSettings() {
       <div id="otpEditForm"></div>
       
       <button class="settings-btn success" onclick="showAddCoordinatorForm()">
-        ➕ Add New Coordinator
+        ➕ ${t('addNewCoordinator')}
       </button>
       <div id="addCoordinatorForm"></div>
     </div>
     
     <!--Change Admin Password-->
     <div class="settings-section">
-      <h3>🔐 Admin Password</h3>
+      <h3>🔐 ${t('adminPassword')}</h3>
       <p style="color:#666;font-size:0.85rem;margin-bottom:1rem;">
-        Change the password used for admin login (Dharmesh & Neha share the same password).
+        ${t('changePasswordDesc')}
       </p>
       
       <button class="settings-btn" onclick="showChangePasswordForm()">
-        🔑 Change Admin Password
+        🔑 ${t('changePassword')}
       </button>
       <div id="changePasswordForm"></div>
     </div>
     
     <!--Data Management-->
     <div class="settings-section">
-      <h3>🔄 Data Management</h3>
-      <p style="color:#666;font-size:0.85rem;margin-bottom:1rem;">All changes are saved locally on this device</p>
+      <h3>🔄 ${t('dataManagement')}</h3>
+      <p style="color:#666;font-size:0.85rem;margin-bottom:1rem;">${t('dataLocalNote')}</p>
       
       <button class="settings-btn warning" onclick="confirmResetData()">
-        🔄 Reset All Data to Defaults
+        🔄 ${t('resetToDefaults')}
       </button>
       
       <button class="settings-btn" onclick="exportData()">
-        📥 Export Data (JSON)
+        📥 ${t('exportData')}
       </button>
     </div>
     
     <div class="settings-section">
-      <h3>📱 App Info</h3>
+      <h3>📱 ${t('appInfo')}</h3>
       <div class="info-row">
-        <span>Version</span>
+        <span>${t('version')}</span>
         <span>2.0.0</span>
       </div>
       <div class="info-row">
-        <span>Admin User</span>
+        <span>${t('adminUser')}</span>
         <span>${currentUser.name}</span>
       </div>
       <div class="info-row">
-        <span>Total Coordinators</span>
+        <span>${t('totalCoordinators')}</span>
         <span>${allCoords.length}</span>
       </div>
       <div class="info-row">
-        <span>Total Guests</span>
+        <span>${t('totalGuests')}</span>
         <span>${GUEST_LIST.length}</span>
       </div>
     </div>
@@ -1451,15 +1433,15 @@ function editOTP(coordinatorName) {
 
   container.innerHTML = `
     <div class="admin-form otp-edit-form">
-      <h4>Edit OTP for ${coordinatorName}</h4>
+      <h4>${t('editOTP')} - ${coordinatorName}</h4>
       <div class="form-group">
-        <label>New 4-Digit OTP</label>
+        <label>${t('accessCode')}</label>
         <input type="text" id="newOtpValue" value="${currentOTP}" maxlength="4" pattern="[0-9]{4}" 
                inputmode="numeric" style="text-align: center; font-size: 1.5rem; letter-spacing: 0.5rem;">
       </div>
       <div class="form-buttons">
-        <button onclick="saveEditedOTP('${coordinatorName}')">Save OTP</button>
-        <button onclick="hideOTPEditForm()" class="cancel">Cancel</button>
+        <button onclick="saveEditedOTP('${coordinatorName}')">${t('save')}</button>
+        <button onclick="hideOTPEditForm()" class="cancel">${t('cancel')}</button>
       </div>
     </div>
     `;
@@ -1495,26 +1477,26 @@ function showAddCoordinatorForm() {
   const container = document.getElementById('addCoordinatorForm');
   container.innerHTML = `
     <div class="admin-form add-coordinator-form">
-      <h4>Add New Coordinator</h4>
+      <h4>${t('addNewCoordinator')}</h4>
       <div class="form-group">
-        <label>Name *</label>
-        <input type="text" id="newCoordName" placeholder="Full Name" required>
+        <label>${t('name')} *</label>
+        <input type="text" id="newCoordName" placeholder="${t('name')}" required>
       </div>
       <div class="form-group">
-        <label>Role</label>
-        <input type="text" id="newCoordRole" placeholder="e.g. Photography Lead">
+        <label>${t('role')}</label>
+        <input type="text" id="newCoordRole" placeholder="${t('role')}">
       </div>
       <div class="form-group">
-        <label>Phone</label>
-        <input type="tel" id="newCoordPhone" placeholder="Phone Number">
+        <label>${t('phone')}</label>
+        <input type="tel" id="newCoordPhone" placeholder="${t('phone')}">
       </div>
       <div class="form-group">
-        <label>Events Assignment</label>
-        <input type="text" id="newCoordEvents" placeholder="e.g. 24-25 All Events">
+        <label>${t('eventsAssignment')}</label>
+        <input type="text" id="newCoordEvents" placeholder="${t('eventsAssignment')}">
       </div>
       <div class="form-buttons">
-        <button onclick="saveNewCoordinator()">Add Coordinator</button>
-        <button onclick="hideAddCoordinatorForm()" class="cancel">Cancel</button>
+        <button onclick="saveNewCoordinator()">${t('add')} ${t('coordinator')}</button>
+        <button onclick="hideAddCoordinatorForm()" class="cancel">${t('cancel')}</button>
       </div>
     </div>
     `;
@@ -1552,22 +1534,22 @@ function showChangePasswordForm() {
   const container = document.getElementById('changePasswordForm');
   container.innerHTML = `
     <div class="admin-form change-password-form">
-      <h4>Change Admin Password</h4>
+      <h4>${t('changePassword')}</h4>
       <div class="form-group">
-        <label>Current Password</label>
-        <input type="password" id="currentPwd" placeholder="Enter current password" required>
+        <label>${t('currentPassword')}</label>
+        <input type="password" id="currentPwd" placeholder="${t('currentPassword')}" required>
       </div>
       <div class="form-group">
-        <label>New Password</label>
-        <input type="password" id="newPwd" placeholder="Enter new password" required>
+        <label>${t('newPassword')}</label>
+        <input type="password" id="newPwd" placeholder="${t('newPassword')}" required>
       </div>
       <div class="form-group">
-        <label>Confirm New Password</label>
-        <input type="password" id="confirmPwd" placeholder="Confirm new password" required>
+        <label>${t('confirmPassword')}</label>
+        <input type="password" id="confirmPwd" placeholder="${t('confirmPassword')}" required>
       </div>
       <div class="form-buttons">
-        <button onclick="saveNewPassword()">Change Password</button>
-        <button onclick="hideChangePasswordForm()" class="cancel">Cancel</button>
+        <button onclick="saveNewPassword()">${t('changePassword')}</button>
+        <button onclick="hideChangePasswordForm()" class="cancel">${t('cancel')}</button>
       </div>
     </div>
     `;
@@ -1610,17 +1592,17 @@ function showAddEventForm() {
   const container = document.getElementById('eventFormContainer');
   container.innerHTML = `
     <div class="admin-form">
-      <h4>Add New Event</h4>
-      <input type="text" id="eventName" placeholder="Event Name" required>
+      <h4>${t('addNewEvent')}</h4>
+      <input type="text" id="eventName" placeholder="${t('eventName')}" required>
       <input type="date" id="eventDate" required>
       <input type="time" id="eventTime" required>
-      <input type="text" id="eventVenue" placeholder="Venue">
-      <input type="text" id="eventEmoji" placeholder="Emoji (e.g. 🎉)" value="🎉">
-      <input type="text" id="eventDress" placeholder="Dress Code" value="Traditional">
-      <textarea id="eventDesc" placeholder="Description"></textarea>
+      <input type="text" id="eventVenue" placeholder="${t('venue')}">
+      <input type="text" id="eventEmoji" placeholder="${t('emoji')} (e.g. 🎉)" value="🎉">
+      <input type="text" id="eventDress" placeholder="${t('dressCode')}" value="Traditional">
+      <textarea id="eventDesc" placeholder="${t('description')}"></textarea>
       <div class="form-buttons">
-        <button onclick="saveNewEvent()">Save</button>
-        <button onclick="hideEventForm()" class="cancel">Cancel</button>
+        <button onclick="saveNewEvent()">${t('save')}</button>
+        <button onclick="hideEventForm()" class="cancel">${t('cancel')}</button>
       </div>
     </div>
   `;
@@ -1674,14 +1656,14 @@ function showAddGuestForm() {
   const container = document.getElementById('guestFormContainer');
   container.innerHTML = `
     <div class="admin-form">
-      <h4>Add New Guest</h4>
-      <input type="text" id="guestName" placeholder="Guest Name" required>
-      <input type="tel" id="guestPhone" placeholder="Phone Number">
-      <input type="number" id="guestCount" placeholder="Number of guests" value="1" min="1">
-      <input type="text" id="guestRoom" placeholder="Room Assignment (e.g. GANGOTRI)">
+      <h4>${t('addGuest')}</h4>
+      <input type="text" id="guestName" placeholder="${t('name')}" required>
+      <input type="tel" id="guestPhone" placeholder="${t('phone')}">
+      <input type="number" id="guestCount" placeholder="${t('guestCount')}" value="1" min="1">
+      <input type="text" id="guestRoom" placeholder="${t('roomAssignment')}">
       <div class="form-buttons">
-        <button onclick="saveNewGuest()">Save</button>
-        <button onclick="hideGuestForm()" class="cancel">Cancel</button>
+        <button onclick="saveNewGuest()">${t('save')}</button>
+        <button onclick="hideGuestForm()" class="cancel">${t('cancel')}</button>
       </div>
     </div>
   `;
@@ -1715,8 +1697,8 @@ function showAddTaskForm() {
   const container = document.getElementById('taskFormContainer');
   container.innerHTML = `
     <div class="admin-form">
-      <h4>Add Pre-Wedding Task</h4>
-      <input type="text" id="taskName" placeholder="Task description" required>
+      <h4>${t('addPreWeddingTask')}</h4>
+      <input type="text" id="taskName" placeholder="${t('description')}" required>
       <input type="date" id="taskDue" required>
       <select id="taskAssignee">
         ${WEDDING_DATA.coordinators.map(c => `<option value="${c.name}">${c.name}</option>`).join('')}
@@ -1728,8 +1710,8 @@ function showAddTaskForm() {
         <option value="critical">Critical</option>
       </select>
       <div class="form-buttons">
-        <button onclick="saveNewTask()">Save</button>
-        <button onclick="hideTaskForm()" class="cancel">Cancel</button>
+        <button onclick="saveNewTask()">${t('save')}</button>
+        <button onclick="hideTaskForm()" class="cancel">${t('cancel')}</button>
       </div>
     </div>
   `;
@@ -1835,14 +1817,14 @@ function editEventForm(eventId) {
   const container = document.getElementById('eventFormContainer');
   container.innerHTML = `
     <div class="admin-form">
-      <h4>✏️ Edit Event</h4>
-      <input type="text" id="editEventName" placeholder="Event Name" value="${event.name}" required>
+      <h4>✏️ ${t('edit')} ${t('events')}</h4>
+      <input type="text" id="editEventName" placeholder="${t('eventName')}" value="${event.name}" required>
       <input type="date" id="editEventDate" value="${dateValue}" required>
       <input type="time" id="editEventTime" value="${timeValue}" required>
-      <input type="text" id="editEventVenue" placeholder="Venue" value="${event.venue || ''}">
-      <input type="text" id="editEventEmoji" placeholder="Emoji (e.g. 🎉)" value="${event.emoji || '🎉'}">
-      <input type="text" id="editEventDress" placeholder="Dress Code" value="${event.dressCode || 'Traditional'}">
-      <textarea id="editEventDesc" placeholder="Description">${event.description || ''}</textarea>
+      <input type="text" id="editEventVenue" placeholder="${t('venue')}" value="${event.venue || ''}">
+      <input type="text" id="editEventEmoji" placeholder="${t('emoji')} (e.g. 🎉)" value="${event.emoji || '🎉'}">
+      <input type="text" id="editEventDress" placeholder="${t('dressCode')}" value="${event.dressCode || 'Traditional'}">
+      <textarea id="editEventDesc" placeholder="${t('description')}">${event.description || ''}</textarea>
       <select id="editEventCategory">
         <option value="main" ${event.category === 'main' ? 'selected' : ''}>Main Event</option>
         <option value="meal" ${event.category === 'meal' ? 'selected' : ''}>Meal</option>
@@ -1851,8 +1833,8 @@ function editEventForm(eventId) {
         <option value="custom" ${event.category === 'custom' ? 'selected' : ''}>Custom</option>
       </select>
       <div class="form-buttons">
-        <button onclick="saveEditedEvent(${eventId})">💾 Save Changes</button>
-        <button onclick="hideEventForm()" class="cancel">Cancel</button>
+        <button onclick="saveEditedEvent(${eventId})">💾 ${t('save')}</button>
+        <button onclick="hideEventForm()" class="cancel">${t('cancel')}</button>
       </div>
     </div>
   `;
@@ -1899,14 +1881,14 @@ function editGuestForm(guestId) {
   const container = document.getElementById('guestFormContainer');
   container.innerHTML = `
     <div class="admin-form">
-      <h4>✏️ Edit Guest</h4>
-      <input type="text" id="editGuestName" placeholder="Guest Name" value="${guest.name}" required>
-      <input type="tel" id="editGuestPhone" placeholder="Phone Number" value="${guest.phone || ''}">
-      <input type="number" id="editGuestCount" placeholder="Number of guests" value="${guest.count || 1}" min="1">
-      <input type="text" id="editGuestRoom" placeholder="Room Assignment (e.g. GANGOTRI)" value="${guest.room || ''}">
+      <h4>✏️ ${t('edit')} ${t('guest')}</h4>
+      <input type="text" id="editGuestName" placeholder="${t('name')}" value="${guest.name}" required>
+      <input type="tel" id="editGuestPhone" placeholder="${t('phone')}" value="${guest.phone || ''}">
+      <input type="number" id="editGuestCount" placeholder="${t('guestCount')}" value="${guest.count || 1}" min="1">
+      <input type="text" id="editGuestRoom" placeholder="${t('roomAssignment')}" value="${guest.room || ''}">
       <div class="form-buttons">
-        <button onclick="saveEditedGuest(${guestId})">💾 Save Changes</button>
-        <button onclick="hideGuestForm()" class="cancel">Cancel</button>
+        <button onclick="saveEditedGuest(${guestId})">💾 ${t('save')}</button>
+        <button onclick="hideGuestForm()" class="cancel">${t('cancel')}</button>
       </div>
     </div>
   `;
