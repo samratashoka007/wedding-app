@@ -1092,7 +1092,8 @@ function getCoordinatorAllTasks(coordinatorName) {
         return coordName.includes(taskLower) || taskLower.includes(coordName);
     };
     
-    return ALL_TASKS.filter(task => {
+    // Get tasks from the main task list
+    const mainTasks = ALL_TASKS.filter(task => {
         const isOwner = namesMatch(task.owner, name);
         const isCrowdLead = namesMatch(task.crowdLead, name);
         const isSupport = namesMatch(task.support, name);
@@ -1102,6 +1103,19 @@ function getCoordinatorAllTasks(coordinatorName) {
         role: namesMatch(task.owner, name) ? 'owner' :
               namesMatch(task.crowdLead, name) ? 'crowdLead' : 'support'
     }));
+    
+    // Get custom tasks added by admin
+    const customTasks = JSON.parse(localStorage.getItem('customTasks') || '[]');
+    const myCustomTasks = customTasks.filter(task => {
+        return namesMatch(task.assignee, name);
+    }).map(task => ({
+        ...task,
+        role: 'owner',
+        isCustom: true
+    }));
+    
+    // Combine and return all tasks
+    return [...mainTasks, ...myCustomTasks];
 }
 
 // Legacy DAY_TASKS for backward compatibility

@@ -1935,6 +1935,75 @@ h4 {
   opacity: 0.9;
 }
 
+.settings-btn.success {
+  background: var(--success);
+  color: white;
+}
+
+/* Sync Status */
+.sync-status {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem;
+  border-radius: 10px;
+  background: #f8f9fa;
+}
+
+.sync-status.connected {
+  background: #d4edda;
+}
+
+.sync-status.offline {
+  background: #fff3cd;
+}
+
+.sync-status .sync-icon {
+  font-size: 1.2rem;
+}
+
+.sync-status .sync-text {
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+/* Custom Task Item */
+.custom-task-item {
+  transition: all 0.2s;
+}
+
+.custom-task-item:hover {
+  background: #e9ecef !important;
+}
+
+/* Add Task Form */
+.add-task-form .form-group {
+  margin-bottom: 0.75rem;
+}
+
+.add-task-form label {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 500;
+  margin-bottom: 0.25rem;
+  color: #555;
+}
+
+.add-task-form input,
+.add-task-form select {
+  width: 100%;
+  padding: 0.6rem;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 0.9rem;
+}
+
+.add-task-form input:focus,
+.add-task-form select:focus {
+  outline: none;
+  border-color: var(--burgundy);
+}
+
 .info-row {
   display: flex;
   justify-content: space-between;

@@ -686,15 +686,24 @@ function renderTaskCard(task) {
   `;
 }
 
-// Toggle task by ID
+// Toggle task by ID (with Firebase sync)
 function toggleTaskById(taskId) {
   const taskIdStr = taskId.toString();
-  if (completedTasks.includes(taskIdStr)) {
-    completedTasks = completedTasks.filter(t => t !== taskIdStr);
-  } else {
+  const isCompleting = !completedTasks.includes(taskIdStr);
+  
+  if (isCompleting) {
     completedTasks.push(taskIdStr);
+  } else {
+    completedTasks = completedTasks.filter(t => t !== taskIdStr);
   }
-  localStorage.setItem('completedTasks', JSON.stringify(completedTasks));
+  
+  // Sync to Firebase (will also save to localStorage)
+  if (window.firebaseSync && window.firebaseSync.markTaskComplete) {
+    window.firebaseSync.markTaskComplete(taskIdStr, isCompleting);
+  } else {
+    localStorage.setItem('completedTasks', JSON.stringify(completedTasks));
+  }
+  
   renderDashboard();
 }
 
@@ -847,14 +856,23 @@ function previewDay(day) {
 
 let selectedPreviewDay = null;
 
-// Toggle Task
+// Toggle Task (with Firebase sync)
 function toggleTask(task) {
-  if (completedTasks.includes(task)) {
-    completedTasks = completedTasks.filter(t => t !== task);
-  } else {
+  const isCompleting = !completedTasks.includes(task);
+  
+  if (isCompleting) {
     completedTasks.push(task);
+  } else {
+    completedTasks = completedTasks.filter(t => t !== task);
   }
-  localStorage.setItem('completedTasks', JSON.stringify(completedTasks));
+  
+  // Sync to Firebase (will also save to localStorage)
+  if (window.firebaseSync && window.firebaseSync.markTaskComplete) {
+    window.firebaseSync.markTaskComplete(task, isCompleting);
+  } else {
+    localStorage.setItem('completedTasks', JSON.stringify(completedTasks));
+  }
+  
   renderDashboard();
 }
 
@@ -1418,6 +1436,8 @@ function renderAdminVendors() {
 // Admin Settings
 function renderAdminSettings() {
   const allCoords = getAllCoordinators();
+  const syncStatus = window.firebaseSync ? window.firebaseSync.getSyncStatus() : { isFirebaseConfigured: false, isFirebaseConnected: false };
+  const customTasks = JSON.parse(localStorage.getItem('customTasks') || '[]');
 
   // Default OTPs (same across all devices)
   const defaultOTPs = {
@@ -1436,6 +1456,72 @@ function renderAdminSettings() {
     <div class="section-header">
       <span class="emoji">⚙️</span>
       <h2>${t('settings')}</h2>
+    </div>
+    
+    <!-- Sync Status -->
+    <div class="settings-section sync-status-section">
+      <h3>🔄 Sync Status</h3>
+      <div class="sync-status ${syncStatus.isFirebaseConnected ? 'connected' : 'offline'}">
+        <span class="sync-icon">${syncStatus.isFirebaseConnected ? '🟢' : '🟡'}</span>
+        <span class="sync-text">
+          ${syncStatus.isFirebaseConnected 
+            ? t('syncConnected') 
+            : syncStatus.isFirebaseConfigured 
+              ? 'Connecting...' 
+              : t('syncDisabled')}
+        </span>
+      </div>
+      ${!syncStatus.isFirebaseConfigured ? `
+        <div class="firebase-setup-info">
+          <p style="color:#856404;background:#fff3cd;padding:12px;border-radius:8px;margin-top:1rem;font-size:0.85rem;">
+            <strong>⚠️ ${t('firebaseSetupTitle')}</strong><br>
+            ${t('firebaseSetupDesc')}<br><br>
+            <strong>${t('firebaseSetupSteps')}:</strong><br>
+            1. Go to <a href="https://console.firebase.google.com/" target="_blank">Firebase Console</a><br>
+            2. Create a project (free)<br>
+            3. Enable Realtime Database<br>
+            4. Update firebase-config.js with your keys<br>
+          </p>
+        </div>
+      ` : `
+        <div class="sync-info" style="background:#d4edda;padding:12px;border-radius:8px;margin-top:1rem;font-size:0.85rem;">
+          <strong>✅ Real-time sync is active!</strong><br>
+          All task completions will sync across all devices automatically.
+        </div>
+      `}
+    </div>
+    
+    <!-- Custom Tasks (Admin can add new tasks) -->
+    <div class="settings-section">
+      <h3>➕ ${t('addNewTask')}</h3>
+      <p style="color:#666;font-size:0.85rem;margin-bottom:1rem;">
+        Add custom tasks that will appear for assigned coordinators.
+        ${syncStatus.isFirebaseConnected ? ' Tasks will sync to all devices!' : ' (Tasks will only show on this device until Firebase is set up)'}
+      </p>
+      
+      <button class="settings-btn success" onclick="showAddTaskForm()">
+        ➕ ${t('addNewTask')}
+      </button>
+      <div id="addTaskForm"></div>
+      
+      ${customTasks.length > 0 ? `
+        <div class="custom-tasks-list" style="margin-top:1rem;">
+          <h4 style="margin-bottom:0.5rem;">${t('customTasksTitle')} (${customTasks.length})</h4>
+          ${customTasks.map(task => `
+            <div class="custom-task-item" style="display:flex;justify-content:space-between;align-items:center;padding:0.75rem;background:#f8f9fa;border-radius:8px;margin-bottom:0.5rem;">
+              <div>
+                <strong>${task.task}</strong>
+                <div style="font-size:0.8rem;color:#666;">
+                  📋 ${task.assignee || 'Unassigned'} | 📅 ${task.dueDate || 'No date'} | ${task.priority || 'medium'}
+                </div>
+              </div>
+              <button class="otp-btn danger" onclick="deleteCustomTaskById('${task.id}')" title="${t('deleteTask')}">🗑️</button>
+            </div>
+          `).join('')}
+        </div>
+      ` : `
+        <p style="color:#999;font-size:0.85rem;margin-top:1rem;">${t('noCustomTasks')}</p>
+      `}
     </div>
     
     <!--Coordinator OTP Management-->
@@ -1528,6 +1614,100 @@ function copyOTP(otp, coordinatorName) {
   } else {
     prompt(`Copy this OTP for ${coordinatorName}:`, otp);
   }
+}
+
+// Show Add Task Form
+function showAddTaskForm() {
+  const allCoords = getAllCoordinators();
+  const container = document.getElementById('addTaskForm');
+  container.innerHTML = `
+    <div class="admin-form add-task-form" style="margin-top:1rem;padding:1rem;background:#f8f9fa;border-radius:8px;">
+      <h4 style="margin-bottom:1rem;">➕ ${t('addNewTask')}</h4>
+      <div class="form-group">
+        <label>${t('taskName')} *</label>
+        <input type="text" id="newTaskName" placeholder="Enter task description" required>
+      </div>
+      <div class="form-group">
+        <label>${t('assignTo')} *</label>
+        <select id="newTaskAssignee">
+          ${allCoords.map(c => `<option value="${c.name}">${c.name}</option>`).join('')}
+        </select>
+      </div>
+      <div class="form-group">
+        <label>${t('dueDate')}</label>
+        <input type="date" id="newTaskDueDate">
+      </div>
+      <div class="form-group">
+        <label>${t('priority')}</label>
+        <select id="newTaskPriority">
+          <option value="low">🟢 Low</option>
+          <option value="medium" selected>🟡 Medium</option>
+          <option value="high">🟠 High</option>
+          <option value="critical">🔴 Critical</option>
+        </select>
+      </div>
+      <div class="form-buttons" style="margin-top:1rem;">
+        <button onclick="saveCustomTask()" class="settings-btn success">${t('addTask')}</button>
+        <button onclick="hideAddTaskForm()" class="settings-btn">${t('cancel')}</button>
+      </div>
+    </div>
+  `;
+}
+
+function hideAddTaskForm() {
+  document.getElementById('addTaskForm').innerHTML = '';
+}
+
+function saveCustomTask() {
+  const taskName = document.getElementById('newTaskName').value.trim();
+  const assignee = document.getElementById('newTaskAssignee').value;
+  const dueDate = document.getElementById('newTaskDueDate').value;
+  const priority = document.getElementById('newTaskPriority').value;
+  
+  if (!taskName) {
+    alert('Please enter a task name');
+    return;
+  }
+  
+  const newTask = {
+    id: 'custom_' + Date.now(),
+    task: taskName,
+    assignee: assignee,
+    dueDate: dueDate || null,
+    priority: priority,
+    isCustom: true,
+    createdAt: new Date().toISOString()
+  };
+  
+  // Use Firebase sync if available
+  if (window.firebaseSync && window.firebaseSync.addCustomTask) {
+    window.firebaseSync.addCustomTask(newTask);
+  } else {
+    // Save locally
+    let customTasks = JSON.parse(localStorage.getItem('customTasks') || '[]');
+    customTasks.push(newTask);
+    localStorage.setItem('customTasks', JSON.stringify(customTasks));
+  }
+  
+  hideAddTaskForm();
+  renderApp();
+  alert('✅ Task added successfully!');
+}
+
+function deleteCustomTaskById(taskId) {
+  if (!confirm('Delete this task?')) return;
+  
+  // Use Firebase sync if available
+  if (window.firebaseSync && window.firebaseSync.deleteCustomTask) {
+    window.firebaseSync.deleteCustomTask(taskId);
+  } else {
+    // Delete locally
+    let customTasks = JSON.parse(localStorage.getItem('customTasks') || '[]');
+    customTasks = customTasks.filter(t => t.id !== taskId);
+    localStorage.setItem('customTasks', JSON.stringify(customTasks));
+  }
+  
+  renderApp();
 }
 
 // Change admin password form
@@ -1785,6 +1965,10 @@ window.saveEditedEvent = saveEditedEvent;
 window.editGuestForm = editGuestForm;
 window.saveEditedGuest = saveEditedGuest;
 window.copyOTP = copyOTP;
+window.showAddTaskForm = showAddTaskForm;
+window.hideAddTaskForm = hideAddTaskForm;
+window.saveCustomTask = saveCustomTask;
+window.deleteCustomTaskById = deleteCustomTaskById;
 
 function editEventForm(eventId) {
   const events = getEditableEvents();
