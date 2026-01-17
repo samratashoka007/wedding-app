@@ -2170,6 +2170,24 @@ h4 {
   padding: 0.5rem 0.75rem;
   border-radius: 8px;
   font-family: 'Courier New', monospace;
+}
+
+.otp-display.otp-fixed {
+  background: linear-gradient(135deg, #27AE60 0%, #1E8449 100%);
+  font-size: 1.25rem;
+  font-weight: bold;
+  letter-spacing: 0.3rem;
+  padding: 0.6rem 1rem;
+}
+
+.copy-btn {
+  background: var(--gold) !important;
+  color: var(--dark) !important;
+}
+
+.copy-btn:hover {
+  background: var(--gold-light) !important;
+  transform: scale(1.1);
   font-size: 1.1rem;
   font-weight: 700;
   letter-spacing: 0.2rem;

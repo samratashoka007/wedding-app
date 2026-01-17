@@ -1328,7 +1328,19 @@ function renderAdminVendors() {
 // Admin Settings
 function renderAdminSettings() {
   const allCoords = getAllCoordinators();
-  const otps = getCoordinatorOTPs();
+
+  // Default OTPs (same across all devices)
+  const defaultOTPs = {
+    "Vicky Nagar": "1111",
+    "Priyanshu Thakur": "2222",
+    "Jay Nagar": "3333",
+    "Hardik Nagar": "4444",
+    "Preyarsh Nagar": "5555",
+    "Pooja Nagar": "6666",
+    "Himani Chauhan": "7777",
+    "Mukesh Nagar": "8888",
+    "Jayant Chauhan": "9999"
+  };
 
   return `
     <div class="section-header">
@@ -1340,36 +1352,30 @@ function renderAdminSettings() {
     <div class="settings-section">
       <h3>🎯 ${t('coordinatorAccessCodes')}</h3>
       <p style="color:#666;font-size:0.85rem;margin-bottom:1rem;">
-        ${t('manageOTPDesc')}
+        Share these access codes with coordinators. These codes are fixed and work on all devices.
       </p>
       
       <div class="coordinator-otp-list">
-        ${allCoords.map(coord => `
-          <div class="coordinator-otp-card ${coord.isCustom ? 'custom' : ''}">
+        ${allCoords.filter(c => !c.isCustom).map(coord => `
+          <div class="coordinator-otp-card">
             <div class="coord-info">
               <div class="coord-avatar">${coord.name.charAt(0)}</div>
               <div class="coord-details">
                 <strong>${coord.name}</strong>
                 <span class="coord-role">${coord.role || t('coordinator')}</span>
-                ${coord.isCustom ? '<span class="custom-badge">Custom</span>' : ''}
               </div>
             </div>
             <div class="coord-otp">
-              <span class="otp-display" id="otp-${coord.id || coord.name}">${otps[coord.name] || '----'}</span>
-              <button class="otp-btn" onclick="regenerateOTP('${coord.name}')" title="${t('generateNewOTP')}">🔄</button>
-              <button class="otp-btn" onclick="editOTP('${coord.name}')" title="${t('editOTP')}">✏️</button>
-              ${coord.isCustom ? `<button class="otp-btn danger" onclick="removeCoordinator(${coord.id})" title="${t('remove')}">🗑️</button>` : ''}
+              <span class="otp-display otp-fixed">${defaultOTPs[coord.name] || '----'}</span>
+              <button class="otp-btn copy-btn" onclick="copyOTP('${defaultOTPs[coord.name] || ''}', '${coord.name}')" title="Copy OTP">📋</button>
             </div>
           </div>
         `).join('')}
       </div>
       
-      <div id="otpEditForm"></div>
-      
-      <button class="settings-btn success" onclick="showAddCoordinatorForm()">
-        ➕ ${t('addNewCoordinator')}
-      </button>
-      <div id="addCoordinatorForm"></div>
+      <div class="otp-note" style="background:#e8f5e9;padding:12px;border-radius:8px;margin-top:1rem;font-size:0.85rem;">
+        <strong>💡 Tip:</strong> These OTPs are permanent and work on any device. Just share the code with each coordinator!
+      </div>
     </div>
     
     <!--Change Admin Password-->
@@ -1421,116 +1427,17 @@ function renderAdminSettings() {
   `;
 }
 
-// Regenerate OTP for coordinator
-function regenerateOTP(coordinatorName) {
-  if (confirm(`Generate new OTP for ${coordinatorName} ? `)) {
-    const newOTP = regenerateCoordinatorOTP(coordinatorName);
-    alert(`New OTP for ${coordinatorName}: ${newOTP} \n\nPlease share this with the coordinator securely.`);
-    renderDashboard();
-  }
-}
-
-// Edit OTP form
-function editOTP(coordinatorName) {
-  const container = document.getElementById('otpEditForm');
-  const currentOTP = getCoordinatorOTPs()[coordinatorName] || '';
-
-  container.innerHTML = `
-    <div class="admin-form otp-edit-form">
-      <h4>${t('editOTP')} - ${coordinatorName}</h4>
-      <div class="form-group">
-        <label>${t('accessCode')}</label>
-        <input type="text" id="newOtpValue" value="${currentOTP}" maxlength="4" pattern="[0-9]{4}" 
-               inputmode="numeric" style="text-align: center; font-size: 1.5rem; letter-spacing: 0.5rem;">
-      </div>
-      <div class="form-buttons">
-        <button onclick="saveEditedOTP('${coordinatorName}')">${t('save')}</button>
-        <button onclick="hideOTPEditForm()" class="cancel">${t('cancel')}</button>
-      </div>
-    </div>
-    `;
-}
-
-function hideOTPEditForm() {
-  document.getElementById('otpEditForm').innerHTML = '';
-}
-
-function saveEditedOTP(coordinatorName) {
-  const newOTP = document.getElementById('newOtpValue').value.trim();
-  const result = setCoordinatorOTP(coordinatorName, newOTP);
-
-  if (result.success) {
-    alert(`OTP updated for ${coordinatorName}!`);
-    hideOTPEditForm();
-    renderDashboard();
+// Copy OTP to clipboard
+function copyOTP(otp, coordinatorName) {
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(otp).then(() => {
+      alert(`✅ OTP "${otp}" for ${coordinatorName} copied to clipboard!`);
+    }).catch(() => {
+      prompt(`Copy this OTP for ${coordinatorName}:`, otp);
+    });
   } else {
-    alert(`Error: ${result.error} `);
+    prompt(`Copy this OTP for ${coordinatorName}:`, otp);
   }
-}
-
-// Remove custom coordinator
-function removeCoordinator(coordId) {
-  if (confirm('Are you sure you want to remove this coordinator?')) {
-    deleteCustomCoordinator(coordId);
-    renderDashboard();
-  }
-}
-
-// Add new coordinator form
-function showAddCoordinatorForm() {
-  const container = document.getElementById('addCoordinatorForm');
-  container.innerHTML = `
-    <div class="admin-form add-coordinator-form">
-      <h4>${t('addNewCoordinator')}</h4>
-      <div class="form-group">
-        <label>${t('name')} *</label>
-        <input type="text" id="newCoordName" placeholder="${t('name')}" required>
-      </div>
-      <div class="form-group">
-        <label>${t('role')}</label>
-        <input type="text" id="newCoordRole" placeholder="${t('role')}">
-      </div>
-      <div class="form-group">
-        <label>${t('phone')}</label>
-        <input type="tel" id="newCoordPhone" placeholder="${t('phone')}">
-      </div>
-      <div class="form-group">
-        <label>${t('eventsAssignment')}</label>
-        <input type="text" id="newCoordEvents" placeholder="${t('eventsAssignment')}">
-      </div>
-      <div class="form-buttons">
-        <button onclick="saveNewCoordinator()">${t('add')} ${t('coordinator')}</button>
-        <button onclick="hideAddCoordinatorForm()" class="cancel">${t('cancel')}</button>
-      </div>
-    </div>
-    `;
-}
-
-function hideAddCoordinatorForm() {
-  document.getElementById('addCoordinatorForm').innerHTML = '';
-}
-
-function saveNewCoordinator() {
-  const name = document.getElementById('newCoordName').value.trim();
-  if (!name) {
-    alert('Please enter coordinator name');
-    return;
-  }
-
-  const coordinator = {
-    name: name,
-    role: document.getElementById('newCoordRole').value.trim() || 'Coordinator',
-    roleHindi: '',
-    phone: document.getElementById('newCoordPhone').value.trim(),
-    events: document.getElementById('newCoordEvents').value.trim(),
-    tasks: [],
-    isLead: false
-  };
-
-  const result = addCustomCoordinator(coordinator);
-  alert(`Coordinator "${name}" added!\n\nTheir OTP is: ${result.otp} \n\nPlease share this securely.`);
-  hideAddCoordinatorForm();
-  renderDashboard();
 }
 
 // Change admin password form
@@ -1786,6 +1693,7 @@ window.exportData = exportData;
 window.saveEditedEvent = saveEditedEvent;
 window.editGuestForm = editGuestForm;
 window.saveEditedGuest = saveEditedGuest;
+window.copyOTP = copyOTP;
 
 function editEventForm(eventId) {
   const events = getEditableEvents();
