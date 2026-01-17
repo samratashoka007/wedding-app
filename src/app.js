@@ -517,13 +517,12 @@ function getTabContent() {
   }
 }
 
-// Render My Tasks (Coordinator Only) - TIME AWARE
+// Render My Tasks (Coordinator Only) - Shows ALL assigned tasks across all days
 function renderMyTasks() {
   const coord = currentUser.coordinator;
   if (!coord) return `<div class="empty-state"><span>🤔</span>${t('noTasksAssigned')}</div>`;
 
   const countdown = getWeddingCountdown();
-  const phase = getWeddingPhase();
   const now = new Date();
   const currentTime = now.toLocaleTimeString('en-IN', {
     hour: '2-digit',
@@ -539,8 +538,20 @@ function renderMyTasks() {
     timeZone: 'Asia/Kolkata'
   });
 
-  // Get tasks based on phase
-  const myTasks = getCoordinatorTasks(coord.name, phase);
+  // Get ALL tasks assigned to this coordinator across all days
+  const myTasks = getCoordinatorAllTasks(coord.name);
+  
+  // Group tasks by day
+  const tasksByDay = {
+    'Day 1': myTasks.filter(t => t.day === 'Day 1'),
+    'Day 2': myTasks.filter(t => t.day === 'Day 2'),
+    'Day 3': myTasks.filter(t => t.day === 'Day 3')
+  };
+
+  // Count tasks by role
+  const ownerTasks = myTasks.filter(t => t.role === 'owner').length;
+  const supportTasks = myTasks.filter(t => t.role !== 'owner').length;
+  const criticalTasks = myTasks.filter(t => t.priority === 'critical').length;
 
   return `
     <div class="countdown-banner ${countdown.isWeddingDay ? 'wedding-day' : ''}">
@@ -553,32 +564,40 @@ function renderMyTasks() {
       </div>
     </div>
     
-    <div class="section-header">
-      <span class="emoji">👋</span>
-      <h2>${t('hello')}, ${coord.name.split(' ')[0]}!</h2>
-    </div>
-    
-    <div class="phase-indicator">
-      <span class="phase-label">${t('currentPhase')}:</span>
-      <span class="phase-badge ${phase}">${phase === 'pre-wedding' ? '📋 ' + t('preWeddingPrep') :
-      phase === 'day1' ? '🌻 ' + t('haldiSangeet') :
-        phase === 'day2' ? '💒 ' + t('weddingDay') :
-          phase === 'day3' ? '🎉 ' + t('reception') :
-            '✅ ' + t('complete')
-    }</span>
-    </div>
-    
-    ${phase === 'pre-wedding' ? renderPreWeddingTasks(myTasks, coord) : renderDayTasks(myTasks, phase, coord)}
-    
-    <div class="coordinator-card">
-      <div class="coordinator-header">
-        <div class="coordinator-avatar">${coord.name.charAt(0)}</div>
-        <div class="coordinator-info">
-          <h3>${coord.role} ${coord.isLead ? '<span class="lead-badge">LEAD</span>' : ''}</h3>
-          <p class="coordinator-role">${coord.roleHindi}</p>
+    <div class="coordinator-welcome">
+      <div class="welcome-header">
+        <div class="coordinator-avatar-large">${coord.name.charAt(0)}</div>
+        <div class="welcome-text">
+          <h2>${t('hello')}, ${coord.name.split(' ')[0]}! 👋</h2>
+          <p class="coord-role-badge">${coord.role}</p>
+          <p class="coord-events-text">📅 ${coord.events}</p>
         </div>
       </div>
-      <div class="coordinator-events">📅 Active: ${coord.events}</div>
+    </div>
+
+    <div class="task-summary-cards">
+      <div class="summary-card total">
+        <span class="summary-number">${myTasks.length}</span>
+        <span class="summary-label">Total Tasks</span>
+      </div>
+      <div class="summary-card owner">
+        <span class="summary-number">${ownerTasks}</span>
+        <span class="summary-label">As Owner</span>
+      </div>
+      <div class="summary-card support">
+        <span class="summary-number">${supportTasks}</span>
+        <span class="summary-label">As Support</span>
+      </div>
+      <div class="summary-card critical">
+        <span class="summary-number">${criticalTasks}</span>
+        <span class="summary-label">Critical</span>
+      </div>
+    </div>
+
+    <div class="tasks-container">
+      ${renderDayTasksSection('Day 1', '🌻 24 Jan - Haldi & Sangeet', tasksByDay['Day 1'])}
+      ${renderDayTasksSection('Day 2', '💒 25 Jan - Wedding Day', tasksByDay['Day 2'])}
+      ${renderDayTasksSection('Day 3', '🎉 26 Jan - Reception', tasksByDay['Day 3'])}
     </div>
     
     <div class="quick-actions">
@@ -598,14 +617,85 @@ function renderMyTasks() {
       <div class="escalation-item"><strong>${t('resort')}:</strong> ${WEDDING_DATA.escalation.resort24_25}</div>
       <div class="escalation-item"><strong>${t('banquet')}:</strong> ${WEDDING_DATA.escalation.banquet26}</div>
     </div>
-    
-    <div class="rules-card">
-      <h3>📜 ${t('importantRules')}</h3>
-      <ul>
-        ${WEDDING_DATA.rules.map(rule => `<li>${rule}</li>`).join('')}
-      </ul>
+  `;
+}
+
+// Render a day's tasks section
+function renderDayTasksSection(day, title, tasks) {
+  if (!tasks || tasks.length === 0) {
+    return `
+      <div class="day-section">
+        <div class="day-header">
+          <h3>${title}</h3>
+          <span class="task-count">No tasks</span>
+        </div>
+      </div>
+    `;
+  }
+
+  return `
+    <div class="day-section">
+      <div class="day-header">
+        <h3>${title}</h3>
+        <span class="task-count">${tasks.length} tasks</span>
+      </div>
+      <div class="task-timeline">
+        ${tasks.map(task => renderTaskCard(task)).join('')}
+      </div>
     </div>
   `;
+}
+
+// Render individual task card with great UX
+function renderTaskCard(task) {
+  const isCompleted = completedTasks.includes(task.id.toString());
+  const roleClass = task.role === 'owner' ? 'role-owner' : task.role === 'crowdLead' ? 'role-crowd' : 'role-support';
+  const roleLabel = task.role === 'owner' ? '👑 Owner' : task.role === 'crowdLead' ? '👥 Crowd Lead' : '🤝 Support';
+  const priorityClass = task.priority === 'critical' ? 'priority-critical' : task.priority === 'high' ? 'priority-high' : 'priority-medium';
+  
+  return `
+    <div class="task-card ${isCompleted ? 'completed' : ''} ${priorityClass}" data-task-id="${task.id}">
+      <div class="task-card-header">
+        <div class="task-time-badge">
+          <span class="time-icon">🕐</span>
+          <span class="time-text">${task.time}</span>
+        </div>
+        <div class="task-role-badge ${roleClass}">${roleLabel}</div>
+      </div>
+      
+      <div class="task-card-body">
+        <div class="task-checkbox-wrapper" onclick="toggleTaskById(${task.id})">
+          <div class="task-checkbox ${isCompleted ? 'checked' : ''}">
+            ${isCompleted ? '✓' : ''}
+          </div>
+        </div>
+        <div class="task-content">
+          <h4 class="task-event-name ${isCompleted ? 'done' : ''}">${task.event}</h4>
+          <p class="task-action">${task.action}</p>
+          ${task.vendor ? `<div class="task-vendor"><span>🏢</span> ${task.vendor}</div>` : ''}
+          ${task.escalation ? `<div class="task-escalation"><span>🚨</span> Escalate: ${task.escalation}</div>` : ''}
+        </div>
+      </div>
+      
+      ${task.owner && task.role !== 'owner' ? `
+        <div class="task-card-footer">
+          <span class="task-owner-info">👤 Owner: <strong>${task.owner}</strong></span>
+        </div>
+      ` : ''}
+    </div>
+  `;
+}
+
+// Toggle task by ID
+function toggleTaskById(taskId) {
+  const taskIdStr = taskId.toString();
+  if (completedTasks.includes(taskIdStr)) {
+    completedTasks = completedTasks.filter(t => t !== taskIdStr);
+  } else {
+    completedTasks.push(taskIdStr);
+  }
+  localStorage.setItem('completedTasks', JSON.stringify(completedTasks));
+  renderDashboard();
 }
 
 // Render Pre-Wedding Tasks
@@ -1673,6 +1763,7 @@ function exportData() {
 // Make functions globally accessible
 window.logout = logout;
 window.toggleTask = toggleTask;
+window.toggleTaskById = toggleTaskById;
 window.toggleReminder = toggleReminder;
 window.setLanguage = setLanguage;
 window.showAddEventForm = showAddEventForm;
