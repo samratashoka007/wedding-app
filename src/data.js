@@ -1083,15 +1083,24 @@ const ALL_TASKS = [
 // Helper to get tasks for a specific coordinator
 function getCoordinatorAllTasks(coordinatorName) {
     const name = coordinatorName.toLowerCase();
+    
+    // Helper to check if names match (handles partial names like "Pooja" vs "Pooja Nagar")
+    const namesMatch = (taskName, coordName) => {
+        if (!taskName) return false;
+        const taskLower = taskName.toLowerCase();
+        // Check both directions: "pooja" in "pooja nagar" OR "pooja nagar" in "pooja"
+        return coordName.includes(taskLower) || taskLower.includes(coordName);
+    };
+    
     return ALL_TASKS.filter(task => {
-        const isOwner = task.owner && task.owner.toLowerCase().includes(name);
-        const isCrowdLead = task.crowdLead && task.crowdLead.toLowerCase().includes(name);
-        const isSupport = task.support && task.support.toLowerCase().includes(name);
+        const isOwner = namesMatch(task.owner, name);
+        const isCrowdLead = namesMatch(task.crowdLead, name);
+        const isSupport = namesMatch(task.support, name);
         return isOwner || isCrowdLead || isSupport;
     }).map(task => ({
         ...task,
-        role: task.owner && task.owner.toLowerCase().includes(name) ? 'owner' :
-              task.crowdLead && task.crowdLead.toLowerCase().includes(name) ? 'crowdLead' : 'support'
+        role: namesMatch(task.owner, name) ? 'owner' :
+              namesMatch(task.crowdLead, name) ? 'crowdLead' : 'support'
     }));
 }
 
