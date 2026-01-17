@@ -868,6 +868,20 @@ function simpleHash(str) {
 // Default admin password (hashed) - "wedding2026"
 const DEFAULT_ADMIN_PASSWORD_HASH = simpleHash("wedding2026");
 
+// DEFAULT OTPs - These are the same across all devices!
+// Admin can share these with coordinators
+const DEFAULT_COORDINATOR_OTPS = {
+    "Vicky Nagar": "1111",
+    "Priyanshu Thakur": "2222",
+    "Jay Nagar": "3333",
+    "Hardik Nagar": "4444",
+    "Preyarsh Nagar": "5555",
+    "Pooja Nagar": "6666",
+    "Himani Chauhan": "7777",
+    "Mukesh Nagar": "8888",
+    "Jayant Chauhan": "9999"
+};
+
 // Initialize authentication data
 function initAuthData() {
     // Initialize admin password if not set
@@ -875,14 +889,10 @@ function initAuthData() {
         localStorage.setItem('weddingAdminPwd', DEFAULT_ADMIN_PASSWORD_HASH);
     }
 
-    // Initialize coordinator OTPs if not set
+    // ALWAYS use default OTPs to ensure consistency across devices
+    // Admin changes are stored locally but defaults ensure everyone can login
     if (!localStorage.getItem('coordinatorOTPs')) {
-        const defaultOTPs = {};
-        WEDDING_DATA.coordinators.forEach(coord => {
-            // Generate random 4-digit OTP
-            defaultOTPs[coord.name] = generateOTP();
-        });
-        localStorage.setItem('coordinatorOTPs', JSON.stringify(defaultOTPs));
+        localStorage.setItem('coordinatorOTPs', JSON.stringify(DEFAULT_COORDINATOR_OTPS));
     }
 
     // Initialize custom coordinators if not set
@@ -933,19 +943,35 @@ function setCoordinatorOTP(coordinatorName, otp) {
 }
 
 function verifyCoordinatorOTP(coordinatorName, otp) {
-    const otps = getCoordinatorOTPs();
-    const storedOTP = otps[coordinatorName];
     const inputOTP = otp ? otp.toString().trim() : '';
+    
+    // First check default OTPs (these are consistent across all devices)
+    const defaultOTP = DEFAULT_COORDINATOR_OTPS[coordinatorName];
+    
+    // Then check localStorage OTPs (for custom coordinators or admin-changed OTPs)
+    const localOTPs = getCoordinatorOTPs();
+    const localOTP = localOTPs[coordinatorName];
     
     // Debug logging for troubleshooting
     console.log('OTP Verification:', {
         coordinatorName: coordinatorName,
         inputOTP: inputOTP,
-        storedOTP: storedOTP,
-        allOTPs: Object.keys(otps)
+        defaultOTP: defaultOTP,
+        localOTP: localOTP
     });
     
-    return storedOTP && storedOTP.toString().trim() === inputOTP;
+    // Accept either default OTP or locally stored OTP
+    if (defaultOTP && defaultOTP.toString().trim() === inputOTP) {
+        console.log('✅ Matched default OTP');
+        return true;
+    }
+    if (localOTP && localOTP.toString().trim() === inputOTP) {
+        console.log('✅ Matched local OTP');
+        return true;
+    }
+    
+    console.log('❌ OTP did not match');
+    return false;
 }
 
 function regenerateCoordinatorOTP(coordinatorName) {
