@@ -8,7 +8,7 @@ let reminders = [];
 let currentLanguage = localStorage.getItem('weddingLang') || 'en';
 
 // ============================================
-// HELPER FUNCTIONS
+// HELPER FUNCTIONS With Translations
 // ============================================
 
 // Get time ago string
