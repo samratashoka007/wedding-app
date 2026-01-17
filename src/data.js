@@ -1108,11 +1108,33 @@ function getCoordinatorAllTasks(coordinatorName) {
     const customTasks = JSON.parse(localStorage.getItem('customTasks') || '[]');
     const myCustomTasks = customTasks.filter(task => {
         return namesMatch(task.assignee, name);
-    }).map(task => ({
-        ...task,
-        role: 'owner',
-        isCustom: true
-    }));
+    }).map(task => {
+        // Determine day from dueDate
+        let day = 'Day 1'; // default
+        if (task.dueDate) {
+            const date = new Date(task.dueDate);
+            const dayOfMonth = date.getDate();
+            if (dayOfMonth === 24) day = 'Day 1';
+            else if (dayOfMonth === 25) day = 'Day 2';
+            else if (dayOfMonth === 26) day = 'Day 3';
+            else if (dayOfMonth < 24) day = 'Pre-Wedding';
+            else day = 'Day 3'; // after wedding
+        }
+        
+        return {
+            ...task,
+            id: task.id || Date.now(),
+            day: day,
+            date: task.dueDate ? new Date(task.dueDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }) : '24 January 2026',
+            time: task.time || 'Flexible',
+            event: '📋 ' + (task.task || 'Custom Task'),
+            action: task.description || task.task || 'Complete this task',
+            owner: task.assignee,
+            role: 'owner',
+            isCustom: true,
+            priority: task.priority || 'medium'
+        };
+    });
     
     // Combine and return all tasks
     return [...mainTasks, ...myCustomTasks];

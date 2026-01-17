@@ -608,8 +608,9 @@ function renderMyTasks() {
   // Get ALL tasks assigned to this coordinator across all days
   const myTasks = getCoordinatorAllTasks(coord.name);
   
-  // Group tasks by day
+  // Group tasks by day (including custom tasks and pre-wedding)
   const tasksByDay = {
+    'Pre-Wedding': myTasks.filter(t => t.day === 'Pre-Wedding'),
     'Day 1': myTasks.filter(t => t.day === 'Day 1'),
     'Day 2': myTasks.filter(t => t.day === 'Day 2'),
     'Day 3': myTasks.filter(t => t.day === 'Day 3')
@@ -662,6 +663,7 @@ function renderMyTasks() {
     </div>
 
     <div class="tasks-container">
+      ${tasksByDay['Pre-Wedding'].length > 0 ? renderDayTasksSection('Pre-Wedding', '📋 Pre-Wedding Tasks', tasksByDay['Pre-Wedding']) : ''}
       ${renderDayTasksSection('Day 1', '🌻 24 Jan - Haldi & Sangeet', tasksByDay['Day 1'])}
       ${renderDayTasksSection('Day 2', '💒 25 Jan - Wedding Day', tasksByDay['Day 2'])}
       ${renderDayTasksSection('Day 3', '🎉 26 Jan - Reception', tasksByDay['Day 3'])}
