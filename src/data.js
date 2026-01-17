@@ -1518,3 +1518,44 @@ function isAllowedUser(name) {
 
 // Initialize auth on load
 initAuthData();
+
+// ====== EXPOSE FUNCTIONS GLOBALLY ======
+// Make sure all functions are available to app.js
+window.getCoordinatorAllTasks = getCoordinatorAllTasks;
+window.getAllCoordinators = getAllCoordinators;
+window.isAllowedUser = isAllowedUser;
+window.verifyAdminPassword = verifyAdminPassword;
+window.verifyCoordinatorOTP = verifyCoordinatorOTP;
+window.getCoordinatorOTPs = getCoordinatorOTPs;
+window.setCoordinatorOTP = setCoordinatorOTP;
+window.regenerateCoordinatorOTP = regenerateCoordinatorOTP;
+window.getCustomCoordinators = getCustomCoordinators;
+window.addCustomCoordinator = addCustomCoordinator;
+window.updateCustomCoordinator = updateCustomCoordinator;
+window.deleteCustomCoordinator = deleteCustomCoordinator;
+window.loadEditableData = loadEditableData;
+window.saveEditableData = saveEditableData;
+window.resetToDefaults = resetToDefaults;
+window.getEditableEvents = getEditableEvents;
+window.addEvent = addEvent;
+window.updateEvent = updateEvent;
+window.deleteEvent = deleteEvent;
+window.getEditableGuests = getEditableGuests;
+window.addGuest = addGuest;
+window.updateGuest = updateGuest;
+window.deleteGuest = deleteGuest;
+window.getEditableTasks = getEditableTasks;
+window.addTask = addTask;
+window.updateTask = updateTask;
+window.deleteTask = deleteTask;
+window.editableData = editableData;
+window.WEDDING_DATA = WEDDING_DATA;
+window.GUEST_LIST = GUEST_LIST;
+window.BUS_TRAVEL = BUS_TRAVEL;
+window.PRE_WEDDING_TASKS = PRE_WEDDING_TASKS;
+window.DAY_TASKS = DAY_TASKS;
+window.ALL_TASKS = ALL_TASKS;
+window.ADMIN_USERS = ADMIN_USERS;
+window.DEFAULT_COORDINATOR_OTPS = DEFAULT_COORDINATOR_OTPS;
+
+console.log('✅ Data.js loaded, ALL_TASKS count:', ALL_TASKS.length);
