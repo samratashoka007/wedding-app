@@ -18,10 +18,10 @@
 // ============================================
 
 const firebaseConfig = {
-    // ✅ CONFIGURED FOR WEDDING-APP-SYNC
+    // ✅ CONFIGURED FOR WEDDING-APP-SYNC (Singapore Region)
     apiKey: "AIzaSyDxH4Nx7iuAKT6VE3Qa7K3VDlzqWcRIokE",
     authDomain: "wedding-app-sync-ddad6.firebaseapp.com",
-    databaseURL: "https://wedding-app-sync-ddad6-default-rtdb.firebaseio.com",
+    databaseURL: "https://wedding-app-sync-ddad6-default-rtdb.asia-southeast1.firebasedatabase.app",
     projectId: "wedding-app-sync-ddad6",
     storageBucket: "wedding-app-sync-ddad6.firebasestorage.app",
     messagingSenderId: "920722706225",

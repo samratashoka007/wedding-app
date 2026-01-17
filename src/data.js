@@ -1161,12 +1161,16 @@ function resetToDefaults() {
     editableData = loadEditableData();
 }
 
-// ====== CRUD Operations ======
+// ====== CRUD Operations (with Firebase Sync) ======
 // Events
 function addEvent(event) {
     event.id = Date.now();
     editableData.events.push(event);
     saveEditableData(editableData);
+    // Sync to Firebase
+    if (window.firebaseSync && window.firebaseSync.syncEvent) {
+        window.firebaseSync.syncEvent(event, 'add');
+    }
     return event.id;
 }
 
@@ -1175,14 +1179,23 @@ function updateEvent(eventId, updates) {
     if (idx !== -1) {
         editableData.events[idx] = { ...editableData.events[idx], ...updates };
         saveEditableData(editableData);
+        // Sync to Firebase
+        if (window.firebaseSync && window.firebaseSync.syncEvent) {
+            window.firebaseSync.syncEvent(editableData.events[idx], 'update');
+        }
         return true;
     }
     return false;
 }
 
 function deleteEvent(eventId) {
+    const event = editableData.events.find(e => e.id === eventId);
     editableData.events = editableData.events.filter(e => e.id !== eventId);
     saveEditableData(editableData);
+    // Sync to Firebase
+    if (window.firebaseSync && window.firebaseSync.syncEvent && event) {
+        window.firebaseSync.syncEvent(event, 'delete');
+    }
 }
 
 // Guests
@@ -1190,6 +1203,10 @@ function addGuest(guest) {
     guest.id = Date.now();
     editableData.guests.push(guest);
     saveEditableData(editableData);
+    // Sync to Firebase
+    if (window.firebaseSync && window.firebaseSync.syncGuest) {
+        window.firebaseSync.syncGuest(guest, 'add');
+    }
     return guest.id;
 }
 
@@ -1198,14 +1215,23 @@ function updateGuest(guestId, updates) {
     if (idx !== -1) {
         editableData.guests[idx] = { ...editableData.guests[idx], ...updates };
         saveEditableData(editableData);
+        // Sync to Firebase
+        if (window.firebaseSync && window.firebaseSync.syncGuest) {
+            window.firebaseSync.syncGuest(editableData.guests[idx], 'update');
+        }
         return true;
     }
     return false;
 }
 
 function deleteGuest(guestId) {
+    const guest = editableData.guests.find(g => g.id === guestId);
     editableData.guests = editableData.guests.filter(g => g.id !== guestId);
     saveEditableData(editableData);
+    // Sync to Firebase
+    if (window.firebaseSync && window.firebaseSync.syncGuest && guest) {
+        window.firebaseSync.syncGuest(guest, 'delete');
+    }
 }
 
 // Tasks
@@ -1213,12 +1239,20 @@ function addPreWeddingTask(task) {
     task.id = Date.now();
     editableData.preWeddingTasks.push(task);
     saveEditableData(editableData);
+    // Sync to Firebase
+    if (window.firebaseSync && window.firebaseSync.addCustomTask) {
+        window.firebaseSync.addCustomTask({...task, type: 'pre-wedding'});
+    }
     return task.id;
 }
 
 function deletePreWeddingTask(taskId) {
     editableData.preWeddingTasks = editableData.preWeddingTasks.filter(t => t.id !== taskId);
     saveEditableData(editableData);
+    // Sync to Firebase
+    if (window.firebaseSync && window.firebaseSync.deleteCustomTask) {
+        window.firebaseSync.deleteCustomTask(taskId);
+    }
 }
 
 // Get editable events (for rendering)
