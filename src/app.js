@@ -372,6 +372,43 @@ function logout() {
   renderLoginScreen();
 }
 
+// Check for app updates
+function checkForAppUpdate() {
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.getRegistration().then(registration => {
+      if (registration) {
+        registration.update().then(() => {
+          // Check if there's a waiting service worker
+          if (registration.waiting) {
+            // Show update banner
+            if (window.showUpdateBanner) {
+              window.showUpdateBanner();
+            } else {
+              // Fallback: reload to get update
+              if (confirm('🆕 New version available! Reload now to get the latest updates?')) {
+                window.location.reload(true);
+              }
+            }
+          } else {
+            // No update available
+            alert('✅ You\'re using the latest version!');
+          }
+        }).catch(err => {
+          console.error('Update check failed:', err);
+          alert('⚠️ Could not check for updates. Try refreshing the page.');
+        });
+      } else {
+        alert('ℹ️ Service worker not registered. The app will update automatically.');
+      }
+    });
+  } else {
+    // Fallback: just reload
+    if (confirm('🔄 Refresh the app to check for updates?')) {
+      window.location.reload(true);
+    }
+  }
+}
+
 // Check upcoming events
 function checkUpcomingEvents() {
   const upcomingEvents = WEDDING_DATA.events
@@ -426,6 +463,9 @@ function renderDashboard() {
         <div class="header-top">
           <h1 class="header-title">💒 ${WEDDING_DATA.weddingInfo.groom} & ${WEDDING_DATA.weddingInfo.bride}</h1>
           <div class="header-actions">
+            <button class="refresh-btn" onclick="checkForAppUpdate()" title="Check for updates">
+              🔄
+            </button>
             <div id="syncStatusIndicator" class="sync-status-badge ${syncStatus.isFirebaseConnected ? 'sync-connected' : 'sync-offline'}">
               <span class="sync-dot">${syncStatus.isFirebaseConnected ? '🟢' : '⚪'}</span>
               <span class="sync-label">${syncStatus.isFirebaseConnected ? 'Live' : 'Offline'}</span>
@@ -2211,6 +2251,7 @@ function exportData() {
 
 // Make functions globally accessible
 window.logout = logout;
+window.checkForAppUpdate = checkForAppUpdate;
 window.toggleTask = toggleTask;
 window.toggleTaskById = toggleTaskById;
 window.toggleReminder = toggleReminder;

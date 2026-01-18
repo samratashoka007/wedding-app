@@ -12,9 +12,12 @@ let isAppInstalled = false;
 
 function initServiceWorker() {
     if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('./sw.js')
+        navigator.serviceWorker.register('./sw.js?v=11')
             .then(registration => {
                 console.log('✅ Service Worker registered:', registration.scope);
+                
+                // Check for updates immediately
+                registration.update();
                 
                 // Check for updates
                 registration.addEventListener('updatefound', () => {
@@ -22,21 +25,31 @@ function initServiceWorker() {
                     newWorker.addEventListener('statechange', () => {
                         if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
                             // New update available
+                            console.log('🆕 New version available!');
                             showUpdateBanner();
                         }
                     });
                 });
                 
-                // Check for updates every 5 minutes
+                // Check for updates every 2 minutes (more frequent)
                 setInterval(() => {
                     registration.update();
-                }, 5 * 60 * 1000);
+                }, 2 * 60 * 1000);
+                
+                // Also check on page visibility change (when user returns to app)
+                document.addEventListener('visibilitychange', () => {
+                    if (!document.hidden) {
+                        registration.update();
+                    }
+                });
             })
             .catch(err => console.log('SW registration failed:', err));
         
         // Handle controller change (new SW took over)
         navigator.serviceWorker.addEventListener('controllerchange', () => {
-            console.log('New service worker activated');
+            console.log('New service worker activated - reloading...');
+            // Auto-reload when new SW takes over
+            window.location.reload();
         });
     }
 }
@@ -394,6 +407,7 @@ document.addEventListener('DOMContentLoaded', () => {
 window.installApp = installApp;
 window.dismissInstall = dismissInstall;
 window.updateApp = updateApp;
+window.showUpdateBanner = showUpdateBanner;
 window.shareWedding = shareWedding;
 window.addToCalendar = addToCalendar;
 window.callEmergency = callEmergency;

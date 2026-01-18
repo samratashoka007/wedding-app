@@ -234,6 +234,31 @@ h4 {
   color: #1565C0;
 }
 
+.refresh-btn {
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  color: var(--white);
+  padding: 0.5rem;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+}
+
+.refresh-btn:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: rotate(180deg);
+}
+
+.refresh-btn:active {
+  transform: rotate(360deg);
+}
+
 .logout-btn {
   background: rgba(255, 255, 255, 0.2);
   border: none;
@@ -2957,6 +2982,13 @@ h4 {
   
   .sync-status-badge {
     padding: 0.25rem 0.5rem;
+  }
+  
+  .refresh-btn {
+    width: 32px;
+    height: 32px;
+    font-size: 0.9rem;
+    padding: 0.4rem;
   }
   
   .logout-btn {

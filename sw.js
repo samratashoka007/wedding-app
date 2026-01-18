@@ -3,9 +3,9 @@
 // Offline support, caching, background sync
 // ============================================
 
-const CACHE_NAME = 'wedding-app-v10';
-const STATIC_CACHE = 'wedding-static-v10';
-const DYNAMIC_CACHE = 'wedding-dynamic-v10';
+const CACHE_NAME = 'wedding-app-v11';
+const STATIC_CACHE = 'wedding-static-v11';
+const DYNAMIC_CACHE = 'wedding-dynamic-v11';
 
 // Files to cache immediately
 const STATIC_FILES = [
