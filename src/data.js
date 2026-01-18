@@ -1398,6 +1398,24 @@ function resetToDefaults() {
     editableData = loadEditableData();
 }
 
+// Force reload data from localStorage (used by Firebase sync)
+function reloadEditableData() {
+    const saved = localStorage.getItem('weddingAppData');
+    if (saved) {
+        try {
+            const data = JSON.parse(saved);
+            editableData.events = data.events || editableData.events;
+            editableData.guests = data.guests || editableData.guests;
+            editableData.meals = data.meals || editableData.meals;
+            editableData.vendors = data.vendors || editableData.vendors;
+            console.log('🔄 Editable data reloaded from localStorage');
+        } catch (e) {
+            console.error('Failed to reload data:', e);
+        }
+    }
+    return editableData;
+}
+
 // ====== CRUD Operations (with Firebase Sync) ======
 // Events
 function addEvent(event) {
@@ -1492,14 +1510,120 @@ function deletePreWeddingTask(taskId) {
     }
 }
 
-// Get editable events (for rendering)
+// Get editable events (for rendering) - reload from localStorage for fresh data
 function getEditableEvents() {
+    // Reload from localStorage to get latest Firebase-synced data
+    const saved = localStorage.getItem('weddingAppData');
+    if (saved) {
+        try {
+            const data = JSON.parse(saved);
+            editableData.events = data.events || editableData.events;
+        } catch (e) {
+            console.error('Failed to reload events:', e);
+        }
+    }
     return editableData.events;
 }
 
-// Get editable guests
+// Get editable guests - reload from localStorage for fresh data
 function getEditableGuests() {
-    return editableData.guests;
+    // Reload from localStorage to get latest Firebase-synced data
+    const saved = localStorage.getItem('weddingAppData');
+    if (saved) {
+        try {
+            const data = JSON.parse(saved);
+            editableData.guests = data.guests || editableData.guests;
+        } catch (e) {
+            console.error('Failed to reload guests:', e);
+        }
+    }
+    // Sort by sortOrder if present, otherwise by original order
+    return editableData.guests.sort((a, b) => {
+        const orderA = a.sortOrder !== undefined ? a.sortOrder : 9999;
+        const orderB = b.sortOrder !== undefined ? b.sortOrder : 9999;
+        return orderA - orderB;
+    });
+}
+
+// Reorder guests by array of guest IDs in new order
+function reorderGuests(orderedGuestIds) {
+    const guestMap = {};
+    editableData.guests.forEach(g => { guestMap[g.id] = g; });
+
+    // Update sortOrder based on position in orderedGuestIds
+    orderedGuestIds.forEach((id, index) => {
+        if (guestMap[id]) {
+            guestMap[id].sortOrder = index;
+        }
+    });
+
+    // Also update any guests not in the list (shouldn't happen but just in case)
+    editableData.guests.forEach(g => {
+        if (g.sortOrder === undefined) {
+            g.sortOrder = 9999;
+        }
+    });
+
+    saveEditableData(editableData);
+
+    // Sync to Firebase
+    if (window.firebaseSync && window.firebaseSync.syncGuestOrder) {
+        window.firebaseSync.syncGuestOrder(orderedGuestIds);
+    } else {
+        // Fallback: sync each guest individually
+        editableData.guests.forEach(g => {
+            if (window.firebaseSync && window.firebaseSync.syncGuest) {
+                window.firebaseSync.syncGuest(g, 'update');
+            }
+        });
+    }
+
+    console.log('📋 Guest order saved:', orderedGuestIds.length, 'guests');
+}
+
+// Get editable tasks (custom tasks from localStorage/Firebase)
+function getEditableTasks() {
+    return JSON.parse(localStorage.getItem('customTasks') || '[]');
+}
+
+// Add a custom task
+function addTask(task) {
+    task.id = 'task_' + Date.now();
+    task.createdAt = new Date().toISOString();
+
+    let tasks = getEditableTasks();
+    tasks.push(task);
+    localStorage.setItem('customTasks', JSON.stringify(tasks));
+
+    // Sync to Firebase
+    if (window.firebaseSync && window.firebaseSync.addCustomTask) {
+        window.firebaseSync.addCustomTask(task);
+    }
+    return task.id;
+}
+
+// Update a custom task
+function updateTask(taskId, updates) {
+    let tasks = getEditableTasks();
+    const idx = tasks.findIndex(t => t.id === taskId);
+    if (idx !== -1) {
+        tasks[idx] = { ...tasks[idx], ...updates };
+        localStorage.setItem('customTasks', JSON.stringify(tasks));
+        return true;
+    }
+    return false;
+}
+
+// Delete a custom task
+function deleteTask(taskId) {
+    let tasks = getEditableTasks();
+    tasks = tasks.filter(t => t.id !== taskId);
+    localStorage.setItem('customTasks', JSON.stringify(tasks));
+
+    // Sync to Firebase
+    if (window.firebaseSync && window.firebaseSync.deleteCustomTask) {
+        window.firebaseSync.deleteCustomTask(taskId);
+    }
 }
 
 // Get current wedding phase
@@ -1803,6 +1927,7 @@ window.updateCustomCoordinator = updateCustomCoordinator;
 window.deleteCustomCoordinator = deleteCustomCoordinator;
 window.loadEditableData = loadEditableData;
 window.saveEditableData = saveEditableData;
+window.reloadEditableData = reloadEditableData;
 window.resetToDefaults = resetToDefaults;
 window.getEditableEvents = getEditableEvents;
 window.addEvent = addEvent;
@@ -1812,6 +1937,7 @@ window.getEditableGuests = getEditableGuests;
 window.addGuest = addGuest;
 window.updateGuest = updateGuest;
 window.deleteGuest = deleteGuest;
+window.reorderGuests = reorderGuests;
 window.getEditableTasks = getEditableTasks;
 window.addTask = addTask;
 window.updateTask = updateTask;

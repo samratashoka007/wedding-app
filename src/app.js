@@ -76,6 +76,7 @@ function checkExistingLogin() {
   const savedUser = localStorage.getItem('weddingAppUser');
   if (savedUser) {
     currentUser = JSON.parse(savedUser);
+    window.currentUser = currentUser; // Expose for Firebase sync
     completedTasks = JSON.parse(localStorage.getItem('completedTasks') || '[]');
     reminders = JSON.parse(localStorage.getItem('weddingReminders') || '[]');
     renderDashboard();
@@ -359,6 +360,9 @@ function completeLogin(userInfo) {
     guestInfo
   };
 
+  // Also expose to window for Firebase sync to check
+  window.currentUser = currentUser;
+
   localStorage.setItem('weddingAppUser', JSON.stringify(currentUser));
   loginState = { step: 1, name: '', phone: '', userInfo: null };
   renderDashboard();
@@ -369,6 +373,7 @@ function completeLogin(userInfo) {
 function logout() {
   localStorage.removeItem('weddingAppUser');
   currentUser = null;
+  window.currentUser = null;
   renderLoginScreen();
 }
 
@@ -1578,22 +1583,34 @@ function renderAdminGuests() {
     
     <div id="guestFormContainer"></div>
     
-    ${guests.map(guest => `
-      <div class="admin-guest-card">
-        <div class="guest-main">
-          <div class="guest-info">
-            <strong>${guest.name}</strong>
-            <span class="guest-count-badge">${guest.count || 1} ${t('pax')}</span>
+    <p class="reorder-hint">💡 ${t('dragToReorder') || 'Drag ☰ or use ⬆️⬇️ buttons to reorder guests'}</p>
+    
+    <div id="guestListContainer" class="sortable-guest-list">
+      ${guests.map((guest, index) => `
+        <div class="admin-guest-card draggable-guest" 
+             data-guest-id="${guest.id}" 
+             data-index="${index}"
+             draggable="true">
+          <div class="drag-handle" title="Drag to reorder">☰</div>
+          <div class="guest-main">
+            <div class="guest-info">
+              <strong>${guest.name}</strong>
+              <span class="guest-count-badge">${guest.count || 1} ${t('pax')}</span>
+            </div>
+            ${guest.room ? `<span class="guest-room-badge">🏨 ${guest.room}</span>` : ''}
           </div>
-          ${guest.room ? `<span class="guest-room-badge">🏨 ${guest.room}</span>` : ''}
+          <div class="guest-reorder-btns">
+            <button class="reorder-btn" onclick="moveGuestUp(${guest.id})" ${index === 0 ? 'disabled' : ''} title="Move up">⬆️</button>
+            <button class="reorder-btn" onclick="moveGuestDown(${guest.id})" ${index === guests.length - 1 ? 'disabled' : ''} title="Move down">⬇️</button>
+          </div>
+          <div class="guest-actions">
+            <button class="edit-btn" onclick="editGuestForm(${guest.id})">✏️</button>
+            <button class="delete-btn" onclick="confirmDeleteGuest(${guest.id})">🗑️</button>
+          </div>
         </div>
-        <div class="guest-actions">
-          <button class="edit-btn" onclick="editGuestForm(${guest.id})">✏️</button>
-          <button class="delete-btn" onclick="confirmDeleteGuest(${guest.id})">🗑️</button>
-        </div>
-      </div>
-    `).join('')
+      `).join('')
     }
+    </div>
   `;
 }
 
@@ -2268,7 +2285,7 @@ function saveCustomTask() {
   }
 
   hideAddTaskForm();
-  renderApp();
+  renderDashboard();
   alert('✅ Task added successfully!');
 }
 
@@ -2285,7 +2302,7 @@ function deleteCustomTaskById(taskId) {
     localStorage.setItem('customTasks', JSON.stringify(customTasks));
   }
 
-  renderApp();
+  renderDashboard();
 }
 
 // Change admin password form
@@ -2602,7 +2619,7 @@ function pullDataFromFirebase() {
     window.firebaseSync.initializeFromFirebase().then(success => {
       if (success) {
         alert('✅ Data synced from Firebase!');
-        renderApp();
+        renderDashboard();
       } else {
         alert('❌ Failed to pull data. Check console for errors.');
       }
@@ -2739,3 +2756,190 @@ function saveEditedGuest(guestId) {
     alert('Failed to update guest!');
   }
 }
+
+// ====== GUEST REORDERING FUNCTIONS ======
+
+// Move guest up in order
+function moveGuestUp(guestId) {
+  const guests = getEditableGuests();
+  const index = guests.findIndex(g => g.id === guestId);
+  if (index > 0) {
+    // Swap with previous guest
+    const orderedIds = guests.map(g => g.id);
+    [orderedIds[index], orderedIds[index - 1]] = [orderedIds[index - 1], orderedIds[index]];
+    reorderGuests(orderedIds);
+    renderDashboard();
+  }
+}
+
+// Move guest down in order
+function moveGuestDown(guestId) {
+  const guests = getEditableGuests();
+  const index = guests.findIndex(g => g.id === guestId);
+  if (index < guests.length - 1) {
+    // Swap with next guest
+    const orderedIds = guests.map(g => g.id);
+    [orderedIds[index], orderedIds[index + 1]] = [orderedIds[index + 1], orderedIds[index]];
+    reorderGuests(orderedIds);
+    renderDashboard();
+  }
+}
+
+// Initialize drag and drop for guest list
+function initGuestDragDrop() {
+  const container = document.getElementById('guestListContainer');
+  if (!container) return;
+
+  let draggedElement = null;
+  let touchStartY = 0;
+  let touchCurrentY = 0;
+
+  // Desktop drag events
+  container.addEventListener('dragstart', (e) => {
+    if (e.target.classList.contains('draggable-guest')) {
+      draggedElement = e.target;
+      e.target.classList.add('dragging');
+      e.dataTransfer.effectAllowed = 'move';
+      e.dataTransfer.setData('text/plain', e.target.dataset.guestId);
+    }
+  });
+
+  container.addEventListener('dragend', (e) => {
+    if (e.target.classList.contains('draggable-guest')) {
+      e.target.classList.remove('dragging');
+      document.querySelectorAll('.drag-over').forEach(el => el.classList.remove('drag-over'));
+      draggedElement = null;
+    }
+  });
+
+  container.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    const target = e.target.closest('.draggable-guest');
+    if (target && target !== draggedElement) {
+      target.classList.add('drag-over');
+    }
+  });
+
+  container.addEventListener('dragleave', (e) => {
+    const target = e.target.closest('.draggable-guest');
+    if (target) {
+      target.classList.remove('drag-over');
+    }
+  });
+
+  container.addEventListener('drop', (e) => {
+    e.preventDefault();
+    const target = e.target.closest('.draggable-guest');
+    if (target && draggedElement && target !== draggedElement) {
+      // Reorder the DOM
+      const allCards = [...container.querySelectorAll('.draggable-guest')];
+      const draggedIdx = allCards.indexOf(draggedElement);
+      const targetIdx = allCards.indexOf(target);
+
+      if (draggedIdx < targetIdx) {
+        target.after(draggedElement);
+      } else {
+        target.before(draggedElement);
+      }
+
+      // Save new order
+      saveCurrentGuestOrder();
+    }
+    document.querySelectorAll('.drag-over').forEach(el => el.classList.remove('drag-over'));
+  });
+
+  // Touch events for mobile
+  container.addEventListener('touchstart', (e) => {
+    const handle = e.target.closest('.drag-handle');
+    if (handle) {
+      draggedElement = handle.closest('.draggable-guest');
+      if (draggedElement) {
+        touchStartY = e.touches[0].clientY;
+        draggedElement.classList.add('touch-dragging');
+      }
+    }
+  }, { passive: true });
+
+  container.addEventListener('touchmove', (e) => {
+    if (!draggedElement) return;
+
+    touchCurrentY = e.touches[0].clientY;
+    const deltaY = touchCurrentY - touchStartY;
+
+    // Visual feedback
+    draggedElement.style.transform = `translateY(${deltaY}px)`;
+
+    // Find element under touch
+    const elemBelow = document.elementFromPoint(
+      e.touches[0].clientX,
+      e.touches[0].clientY
+    );
+    const targetCard = elemBelow?.closest('.draggable-guest');
+
+    document.querySelectorAll('.drag-over').forEach(el => el.classList.remove('drag-over'));
+    if (targetCard && targetCard !== draggedElement) {
+      targetCard.classList.add('drag-over');
+    }
+  }, { passive: true });
+
+  container.addEventListener('touchend', (e) => {
+    if (!draggedElement) return;
+
+    draggedElement.style.transform = '';
+    draggedElement.classList.remove('touch-dragging');
+
+    // Find target
+    const targetCard = document.querySelector('.drag-over');
+    if (targetCard && targetCard !== draggedElement) {
+      const rect = targetCard.getBoundingClientRect();
+      const insertBefore = touchCurrentY < rect.top + rect.height / 2;
+
+      if (insertBefore) {
+        targetCard.before(draggedElement);
+      } else {
+        targetCard.after(draggedElement);
+      }
+
+      // Save new order
+      saveCurrentGuestOrder();
+    }
+
+    document.querySelectorAll('.drag-over').forEach(el => el.classList.remove('drag-over'));
+    draggedElement = null;
+  });
+}
+
+// Save current guest order from DOM
+function saveCurrentGuestOrder() {
+  const container = document.getElementById('guestListContainer');
+  if (!container) return;
+
+  const orderedIds = [...container.querySelectorAll('.draggable-guest')]
+    .map(el => parseInt(el.dataset.guestId));
+
+  reorderGuests(orderedIds);
+}
+
+// Initialize drag-drop when dashboard renders
+const originalRenderDashboard = typeof renderDashboard === 'function' ? renderDashboard : null;
+
+// Override to add initialization
+window.addEventListener('DOMContentLoaded', () => {
+  // Observe for guest list container
+  const observer = new MutationObserver(() => {
+    const container = document.getElementById('guestListContainer');
+    if (container && !container.dataset.dragInitialized) {
+      container.dataset.dragInitialized = 'true';
+      initGuestDragDrop();
+    }
+  });
+  observer.observe(document.body, { childList: true, subtree: true });
+});
+
+// ====== EXPOSE FUNCTIONS GLOBALLY for Firebase Real-time Sync ======
+window.renderDashboard = renderDashboard;
+window.currentUser = currentUser;
+window.moveGuestUp = moveGuestUp;
+window.moveGuestDown = moveGuestDown;
+window.initGuestDragDrop = initGuestDragDrop;
+

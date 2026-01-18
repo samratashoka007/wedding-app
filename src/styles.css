@@ -3736,3 +3736,163 @@ body.offline .sync-status-badge .sync-dot {
     font-size: 0.875rem;
   }
 }
+
+/* ====== GUEST LIST DRAG & DROP REORDERING ====== */
+
+.sortable-guest-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.reorder-hint {
+  font-size: 0.85rem;
+  color: var(--gray);
+  margin: 0.75rem 0;
+  padding: 0.5rem 0.75rem;
+  background: var(--cream);
+  border-radius: 8px;
+  text-align: center;
+}
+
+.draggable-guest {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.drag-handle {
+  cursor: grab;
+  padding: 0.5rem;
+  font-size: 1.25rem;
+  color: var(--gray-light);
+  transition: color 0.2s, transform 0.2s;
+  touch-action: none;
+  flex-shrink: 0;
+}
+
+.drag-handle:hover {
+  color: var(--burgundy);
+  transform: scale(1.1);
+}
+
+.drag-handle:active {
+  cursor: grabbing;
+  color: var(--gold);
+}
+
+/* Guest info takes remaining space */
+.draggable-guest .guest-main {
+  flex: 1;
+  min-width: 0;
+}
+
+/* Reorder buttons container */
+.guest-reorder-btns {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+  flex-shrink: 0;
+}
+
+.reorder-btn {
+  background: var(--cream);
+  border: 1px solid var(--cream-dark);
+  border-radius: 6px;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  line-height: 1;
+}
+
+.reorder-btn:hover:not(:disabled) {
+  background: var(--gold);
+  border-color: var(--gold);
+  transform: scale(1.1);
+}
+
+.reorder-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+/* Dragging state */
+.draggable-guest.dragging {
+  opacity: 0.5;
+  transform: scale(0.98);
+  box-shadow: none;
+}
+
+/* Touch dragging state */
+.draggable-guest.touch-dragging {
+  opacity: 0.9;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+  z-index: 100;
+  position: relative;
+  background: var(--white);
+}
+
+/* Drop target indicator */
+.draggable-guest.drag-over {
+  border-top: 3px solid var(--gold);
+  padding-top: calc(1rem - 3px);
+  background: linear-gradient(180deg, rgba(212, 175, 55, 0.1) 0%, transparent 20%);
+}
+
+.draggable-guest.drag-over::before {
+  content: '↓ Drop here';
+  position: absolute;
+  top: -1.25rem;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--gold);
+  color: var(--dark);
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  white-space: nowrap;
+}
+
+/* Admin guest card adjustments for drag */
+.admin-guest-card.draggable-guest {
+  position: relative;
+  padding-left: 0.5rem;
+}
+
+/* Mobile optimizations */
+@media (max-width: 480px) {
+  .drag-handle {
+    padding: 0.75rem 0.5rem;
+    font-size: 1.5rem;
+    /* Larger touch target */
+  }
+
+  .guest-reorder-btns {
+    flex-direction: row;
+    gap: 0.25rem;
+  }
+
+  .reorder-btn {
+    padding: 0.4rem 0.6rem;
+    font-size: 1rem;
+  }
+
+  .reorder-hint {
+    font-size: 0.8rem;
+  }
+
+  .draggable-guest .guest-actions {
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .draggable-guest .edit-btn,
+  .draggable-guest .delete-btn {
+    padding: 0.4rem 0.6rem;
+  }
+}

@@ -445,13 +445,20 @@ function sanitizeKey(key) {
 
 // Trigger app refresh without full reload
 function triggerAppRefresh() {
-    if (typeof window.renderApp === 'function' &&
-        typeof window.currentUser !== 'undefined' &&
-        window.currentUser) {
+    // Check if user is logged in and dashboard can be rendered
+    if (typeof window.currentUser !== 'undefined' && window.currentUser) {
         // Debounce to prevent rapid re-renders
         clearTimeout(window._refreshTimeout);
         window._refreshTimeout = setTimeout(() => {
-            window.renderApp();
+            // First reload the editable data from localStorage to pick up Firebase changes
+            if (typeof window.reloadEditableData === 'function') {
+                window.reloadEditableData();
+            }
+            // Then refresh the UI
+            if (typeof window.renderDashboard === 'function') {
+                window.renderDashboard();
+                console.log('🔄 UI refreshed from Firebase sync');
+            }
         }, 100);
     }
 }
