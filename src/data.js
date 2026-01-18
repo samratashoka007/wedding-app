@@ -798,7 +798,7 @@ const ALL_TASKS = [
         event: "🎤 Sangeet Pre-Check (DJ/Mic)",
         owner: "Preyarsh",
         crowdLead: "Priyanshu",
-        support: "Pooja",
+        support: "Pooja/Himani",
         vendor: "DJ (Decor Team)",
         action: "Check song list & performance order; Test mic & cue",
         escalation: "Vicky → Faisal",
@@ -813,10 +813,70 @@ const ALL_TASKS = [
         event: "💃 Sangeet Night",
         owner: "Preyarsh",
         crowdLead: "Priyanshu",
-        support: "Pooja",
+        support: "Pooja/Himani",
         vendor: "DJ + Photo",
         action: "Manage show timing; Anchors handle stage; Keep crowd away from stage",
         escalation: "Vicky → Faisal",
+        priority: "high"
+    },
+    {
+        id: 13.1,
+        date: "24 January 2026",
+        day: "Day 1",
+        dayLabel: "Haldi & Sangeet",
+        time: "11:00 AM",
+        event: "💄 Makeup Support (Bride Side)",
+        owner: "Pooja",
+        crowdLead: null,
+        support: "Himani",
+        vendor: "Makeup Artist",
+        action: "Coordinate makeup timing; Support bride and both mothers; Ensure ready on time",
+        escalation: "Jay",
+        priority: "high"
+    },
+    {
+        id: 13.2,
+        date: "25 January 2026",
+        day: "Day 2",
+        dayLabel: "Wedding Day",
+        time: "8:00 AM",
+        event: "💄 Makeup Support (Bride Side - Morning)",
+        owner: "Pooja",
+        crowdLead: null,
+        support: "Himani",
+        vendor: "Makeup Artist",
+        action: "Coordinate morning makeup session; Support bride and family",
+        escalation: "Jay",
+        priority: "high"
+    },
+    {
+        id: 13.3,
+        date: "25 January 2026",
+        day: "Day 2",
+        dayLabel: "Wedding Day",
+        time: "1:00 PM",
+        event: "💄 Makeup Support (Bride Side - Afternoon)",
+        owner: "Pooja",
+        crowdLead: null,
+        support: "Himani",
+        vendor: "Makeup Artist",
+        action: "Coordinate afternoon makeup touch-up; Ensure ready for Barat",
+        escalation: "Jay",
+        priority: "high"
+    },
+    {
+        id: 13.4,
+        date: "26 January 2026",
+        day: "Day 3",
+        dayLabel: "Reception",
+        time: "4:00 PM",
+        event: "💄 Makeup Support (Bride Side - Reception)",
+        owner: "Pooja",
+        crowdLead: null,
+        support: "Himani",
+        vendor: "Makeup Artist",
+        action: "Coordinate reception makeup; Support bride and family",
+        escalation: "Jay",
         priority: "high"
     },
     {
@@ -1084,10 +1144,15 @@ const ALL_TASKS = [
 function getCoordinatorAllTasks(coordinatorName) {
     const name = coordinatorName.toLowerCase();
     
-    // Helper to check if names match (handles partial names like "Pooja" vs "Pooja Nagar")
+    // Helper to check if names match (handles partial names like "Pooja" vs "Pooja Nagar" and "Pooja/Himani")
     const namesMatch = (taskName, coordName) => {
         if (!taskName) return false;
         const taskLower = taskName.toLowerCase();
+        // Handle "Pooja/Himani" format - check if coordinator name matches any part
+        if (taskLower.includes('/')) {
+            const parts = taskLower.split('/').map(p => p.trim());
+            return parts.some(part => coordName.includes(part) || part.includes(coordName));
+        }
         // Check both directions: "pooja" in "pooja nagar" OR "pooja nagar" in "pooja"
         return coordName.includes(taskLower) || taskLower.includes(coordName);
     };

@@ -1729,6 +1729,60 @@ function renderAdminSettings() {
       </div>
     </div>
     
+    <!-- Share App with Coordinators -->
+    <div class="settings-section">
+      <h3>📱 Share App with Coordinators</h3>
+      <p style="color:#666;font-size:0.85rem;margin-bottom:1rem;">
+        Share the app link with coordinators so they can install it on their phones easily.
+      </p>
+      
+      <div class="share-app-card" style="background:linear-gradient(135deg, #8B0000 0%, #5d0000 100%);color:white;padding:1.25rem;border-radius:12px;margin-bottom:1rem;">
+        <div style="display:flex;align-items:center;gap:0.75rem;margin-bottom:1rem;">
+          <span style="font-size:2rem;">💒</span>
+          <div>
+            <strong style="display:block;margin-bottom:0.25rem;">Wedding App Link</strong>
+            <code id="appLink" style="background:rgba(255,255,255,0.2);padding:0.25rem 0.5rem;border-radius:4px;font-size:0.8rem;word-break:break-all;display:block;">${window.location.origin}${window.location.pathname}</code>
+          </div>
+        </div>
+        <div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
+          <button class="settings-btn" onclick="copyAppLink()" style="background:white;color:#8B0000;flex:1;min-width:120px;">
+            📋 Copy Link
+          </button>
+          <button class="settings-btn" onclick="shareAppLink()" style="background:rgba(255,255,255,0.2);color:white;flex:1;min-width:120px;">
+            📤 Share
+          </button>
+          <button class="settings-btn" onclick="showInstallInstructions()" style="background:rgba(255,255,255,0.2);color:white;flex:1;min-width:120px;">
+            📖 Instructions
+          </button>
+        </div>
+      </div>
+      
+      <div class="install-instructions" id="installInstructions" style="display:none;background:#f8f9fa;padding:1rem;border-radius:8px;margin-top:1rem;">
+        <h4 style="margin-bottom:0.75rem;">📱 How to Install on Mobile:</h4>
+        <div style="margin-bottom:1rem;">
+          <strong style="display:block;margin-bottom:0.5rem;color:#8B0000;">Android/Chrome:</strong>
+          <ol style="padding-left:1.25rem;font-size:0.85rem;line-height:1.8;">
+            <li>Open the link in Chrome browser</li>
+            <li>Wait for install banner to appear, OR</li>
+            <li>Tap menu (⋮) → "Install app" or "Add to Home Screen"</li>
+            <li>Tap "Install" when prompted</li>
+          </ol>
+        </div>
+        <div>
+          <strong style="display:block;margin-bottom:0.5rem;color:#8B0000;">iPhone/iPad (Safari):</strong>
+          <ol style="padding-left:1.25rem;font-size:0.85rem;line-height:1.8;">
+            <li>Open the link in Safari browser</li>
+            <li>Tap Share button (📤) at the bottom</li>
+            <li>Scroll down and tap "Add to Home Screen"</li>
+            <li>Tap "Add" in the top right</li>
+          </ol>
+        </div>
+        <div style="margin-top:1rem;padding:0.75rem;background:#fff3cd;border-radius:6px;font-size:0.85rem;">
+          <strong>💡 After Installation:</strong> The app will appear on home screen. Coordinators can open it anytime without remembering the URL!
+        </div>
+      </div>
+    </div>
+    
     <!--Change Admin Password-->
     <div class="settings-section">
       <h3>🔐 ${t('adminPassword')}</h3>
@@ -1788,6 +1842,46 @@ function copyOTP(otp, coordinatorName) {
     });
   } else {
     prompt(`Copy this OTP for ${coordinatorName}:`, otp);
+  }
+}
+
+// Share App Link Functions
+function copyAppLink() {
+  const appLink = window.location.origin + window.location.pathname;
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(appLink).then(() => {
+      alert('✅ App link copied to clipboard! Share it with coordinators via WhatsApp or SMS.');
+    }).catch(() => {
+      prompt('Copy this link to share with coordinators:', appLink);
+    });
+  } else {
+    prompt('Copy this link to share with coordinators:', appLink);
+  }
+}
+
+function shareAppLink() {
+  const appLink = window.location.origin + window.location.pathname;
+  const shareText = `💒 Install the Wedding App!\n\nUse this link to install the app on your phone:\n${appLink}\n\nAfter opening, follow the install instructions.`;
+  
+  if (navigator.share) {
+    navigator.share({
+      title: '💒 Wedding App - Install Link',
+      text: shareText,
+      url: appLink
+    }).catch(err => {
+      console.log('Share cancelled or failed:', err);
+      copyAppLink();
+    });
+  } else {
+    // Fallback to copy
+    copyAppLink();
+  }
+}
+
+function showInstallInstructions() {
+  const instructions = document.getElementById('installInstructions');
+  if (instructions) {
+    instructions.style.display = instructions.style.display === 'none' ? 'block' : 'none';
   }
 }
 
@@ -2140,6 +2234,9 @@ window.saveEditedEvent = saveEditedEvent;
 window.editGuestForm = editGuestForm;
 window.saveEditedGuest = saveEditedGuest;
 window.copyOTP = copyOTP;
+window.copyAppLink = copyAppLink;
+window.shareAppLink = shareAppLink;
+window.showInstallInstructions = showInstallInstructions;
 window.showAddTaskForm = showAddTaskForm;
 window.hideAddTaskForm = hideAddTaskForm;
 window.saveCustomTask = saveCustomTask;
