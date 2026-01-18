@@ -47,11 +47,11 @@ function initFirebase() {
         updateSyncStatusUI();
         return false;
     }
-    
+
     try {
         firebase.initializeApp(firebaseConfig);
         db = firebase.database();
-        
+
         // Monitor connection state
         db.ref('.info/connected').on('value', (snapshot) => {
             if (snapshot.val() === true) {
@@ -64,7 +64,7 @@ function initFirebase() {
             }
             updateSyncStatusUI();
         });
-        
+
         firebaseInitialized = true;
         return true;
     } catch (error) {
@@ -98,22 +98,22 @@ function updateSyncStatusUI() {
 // === TASK COMPLETION SYNC ===
 function initTaskCompletionSync() {
     if (!firebaseInitialized) return;
-    
+
     db.ref('completedTasks').on('value', (snapshot) => {
         const data = snapshot.val() || {};
         const completedArray = Object.keys(data).filter(key => data[key] === true);
-        
+
         // Update local storage
         localStorage.setItem('completedTasks', JSON.stringify(completedArray));
-        
+
         // Update app state
         if (typeof window.completedTasks !== 'undefined') {
             window.completedTasks = completedArray;
         }
-        
+
         // Re-render if app is loaded
         triggerAppRefresh();
-        
+
         console.log("📋 Task completion synced:", completedArray.length, "tasks completed");
     });
 }
@@ -121,7 +121,7 @@ function initTaskCompletionSync() {
 // Mark task complete/incomplete (syncs to all devices)
 function syncMarkTaskComplete(taskId, isComplete) {
     const taskIdStr = taskId.toString();
-    
+
     // Update local state immediately for responsive UI
     let completed = JSON.parse(localStorage.getItem('completedTasks') || '[]');
     if (isComplete) {
@@ -130,21 +130,21 @@ function syncMarkTaskComplete(taskId, isComplete) {
         completed = completed.filter(t => t !== taskIdStr);
     }
     localStorage.setItem('completedTasks', JSON.stringify(completed));
-    
+
     // Sync to Firebase
     if (firebaseInitialized) {
         db.ref('completedTasks/' + sanitizeKey(taskIdStr)).set(isComplete)
             .then(() => console.log("✅ Task sync successful"))
             .catch(err => console.error("Task sync failed:", err));
     }
-    
+
     return completed;
 }
 
 // === CUSTOM TASKS SYNC (Admin added tasks) ===
 function initCustomTasksSync() {
     if (!firebaseInitialized) return;
-    
+
     db.ref('customTasks').on('value', (snapshot) => {
         const tasks = snapshot.val();
         const tasksArray = tasks ? Object.values(tasks) : [];
@@ -162,7 +162,7 @@ function syncAddCustomTask(task) {
         createdAt: new Date().toISOString(),
         createdBy: 'admin'
     };
-    
+
     if (firebaseInitialized) {
         db.ref('customTasks').push(taskWithId)
             .then(() => console.log("✅ Custom task added and synced"))
@@ -174,7 +174,7 @@ function syncAddCustomTask(task) {
     } else {
         saveCustomTaskLocally(taskWithId);
     }
-    
+
     return taskWithId;
 }
 
@@ -190,7 +190,7 @@ function syncDeleteCustomTask(taskId) {
     let customTasks = JSON.parse(localStorage.getItem('customTasks') || '[]');
     customTasks = customTasks.filter(t => t.id !== taskId);
     localStorage.setItem('customTasks', JSON.stringify(customTasks));
-    
+
     // Remove from Firebase
     if (firebaseInitialized) {
         db.ref('customTasks').orderByChild('id').equalTo(taskId).once('value', (snapshot) => {
@@ -204,7 +204,7 @@ function syncDeleteCustomTask(taskId) {
 // === EVENTS SYNC ===
 function initEventsSync() {
     if (!firebaseInitialized) return;
-    
+
     db.ref('events').on('value', (snapshot) => {
         const events = snapshot.val();
         if (events) {
@@ -223,7 +223,7 @@ function initEventsSync() {
 // Sync event changes
 function syncEvent(event, action = 'update') {
     if (!firebaseInitialized) return;
-    
+
     if (action === 'delete') {
         db.ref('events').orderByChild('id').equalTo(event.id).once('value', (snapshot) => {
             snapshot.forEach((child) => child.ref.remove());
@@ -242,7 +242,7 @@ function syncEvent(event, action = 'update') {
 // === GUESTS SYNC ===
 function initGuestsSync() {
     if (!firebaseInitialized) return;
-    
+
     db.ref('guests').on('value', (snapshot) => {
         const guests = snapshot.val();
         if (guests) {
@@ -260,7 +260,7 @@ function initGuestsSync() {
 // Sync guest changes
 function syncGuest(guest, action = 'update') {
     if (!firebaseInitialized) return;
-    
+
     if (action === 'delete') {
         db.ref('guests').orderByChild('id').equalTo(guest.id).once('value', (snapshot) => {
             snapshot.forEach((child) => child.ref.remove());
@@ -279,7 +279,7 @@ function syncGuest(guest, action = 'update') {
 // === ANNOUNCEMENTS (Live messages to all users) ===
 function initAnnouncementsSync() {
     if (!firebaseInitialized) return;
-    
+
     db.ref('announcements').orderByChild('timestamp').limitToLast(5).on('value', (snapshot) => {
         const announcements = [];
         snapshot.forEach((child) => {
@@ -293,29 +293,145 @@ function initAnnouncementsSync() {
 // Send announcement (admin only)
 function syncSendAnnouncement(message, priority = 'normal') {
     if (!firebaseInitialized) return;
-    
+
     const announcement = {
         message: message,
         priority: priority,
         timestamp: Date.now(),
         sender: 'Admin'
     };
-    
+
     db.ref('announcements').push(announcement);
 }
 
 // === ACTIVITY LOG (Track who did what) ===
 function logActivity(action, details) {
     if (!firebaseInitialized) return;
-    
+
     const activity = {
         action: action,
         details: details,
         user: window.currentUser ? window.currentUser.name : 'Unknown',
         timestamp: Date.now()
     };
-    
+
     db.ref('activityLog').push(activity);
+}
+
+// === DECORATION PHOTOS (Reference images for coordinators) ===
+let storage = null;
+
+function initDecorationPhotosSync() {
+    if (!firebaseInitialized) return;
+
+    // Initialize Firebase Storage
+    if (typeof firebase.storage === 'function') {
+        storage = firebase.storage();
+    }
+
+    // Listen for decoration photos changes
+    db.ref('decorationPhotos').on('value', (snapshot) => {
+        const photos = snapshot.val() || {};
+        localStorage.setItem('decorationPhotos', JSON.stringify(photos));
+
+        // Update app state
+        if (typeof window.decorationPhotos !== 'undefined') {
+            window.decorationPhotos = photos;
+        } else {
+            window.decorationPhotos = photos;
+        }
+
+        triggerAppRefresh();
+        console.log("📸 Decoration photos synced");
+    });
+}
+
+// Upload decoration photo (admin only)
+async function syncUploadDecorationPhoto(file, eventName, caption = '') {
+    if (!firebaseInitialized) {
+        alert('Firebase not connected. Please try again.');
+        return null;
+    }
+
+    try {
+        const photoId = 'photo_' + Date.now();
+        const sanitizedEventName = sanitizeKey(eventName);
+
+        // Convert file to base64 for storage in Realtime Database
+        // (Using base64 as a fallback since Storage requires additional setup)
+        const base64 = await fileToBase64(file);
+
+        const photoData = {
+            id: photoId,
+            eventName: eventName,
+            caption: caption,
+            fileName: file.name,
+            fileType: file.type,
+            fileSize: file.size,
+            data: base64,
+            uploadedBy: window.currentUser ? window.currentUser.name : 'Admin',
+            uploadedAt: new Date().toISOString()
+        };
+
+        // Save to Firebase Realtime Database
+        await db.ref(`decorationPhotos/${sanitizedEventName}/${photoId}`).set(photoData);
+
+        console.log("✅ Decoration photo uploaded for:", eventName);
+        logActivity('upload_decoration_photo', { eventName, photoId });
+
+        return photoData;
+    } catch (error) {
+        console.error("Failed to upload decoration photo:", error);
+        alert('Failed to upload photo: ' + error.message);
+        return null;
+    }
+}
+
+// Convert file to base64
+function fileToBase64(file) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+    });
+}
+
+// Delete decoration photo
+async function syncDeleteDecorationPhoto(eventName, photoId) {
+    if (!firebaseInitialized) return false;
+
+    try {
+        const sanitizedEventName = sanitizeKey(eventName);
+        await db.ref(`decorationPhotos/${sanitizedEventName}/${photoId}`).remove();
+
+        console.log("🗑️ Decoration photo deleted:", photoId);
+        logActivity('delete_decoration_photo', { eventName, photoId });
+
+        return true;
+    } catch (error) {
+        console.error("Failed to delete decoration photo:", error);
+        return false;
+    }
+}
+
+// Get decoration photos for an event
+function getDecorationPhotos(eventName) {
+    const photos = JSON.parse(localStorage.getItem('decorationPhotos') || '{}');
+    const sanitizedEventName = sanitizeKey(eventName);
+    return photos[sanitizedEventName] ? Object.values(photos[sanitizedEventName]) : [];
+}
+
+// Get all decoration photos
+function getAllDecorationPhotos() {
+    const photos = JSON.parse(localStorage.getItem('decorationPhotos') || '{}');
+    const allPhotos = [];
+    Object.keys(photos).forEach(eventKey => {
+        Object.values(photos[eventKey]).forEach(photo => {
+            allPhotos.push(photo);
+        });
+    });
+    return allPhotos;
 }
 
 // ============================================
@@ -329,8 +445,8 @@ function sanitizeKey(key) {
 
 // Trigger app refresh without full reload
 function triggerAppRefresh() {
-    if (typeof window.renderApp === 'function' && 
-        typeof window.currentUser !== 'undefined' && 
+    if (typeof window.renderApp === 'function' &&
+        typeof window.currentUser !== 'undefined' &&
         window.currentUser) {
         // Debounce to prevent rapid re-renders
         clearTimeout(window._refreshTimeout);
@@ -354,7 +470,7 @@ function getSyncStatus() {
 // Initialize all data from Firebase (for new devices)
 function initializeFromFirebase() {
     if (!firebaseInitialized) return Promise.resolve(false);
-    
+
     return Promise.all([
         db.ref('events').once('value'),
         db.ref('guests').once('value'),
@@ -372,10 +488,10 @@ function initializeFromFirebase() {
 // Push all local data to Firebase (first-time setup)
 function pushAllDataToFirebase() {
     if (!firebaseInitialized) return Promise.resolve(false);
-    
+
     const events = window.getEditableEvents ? window.getEditableEvents() : window.WEDDING_DATA.events;
     const guests = window.getEditableGuests ? window.getEditableGuests() : window.GUEST_LIST;
-    
+
     // Clear existing and push fresh
     return Promise.all([
         db.ref('events').set(null).then(() => {
@@ -405,10 +521,11 @@ document.addEventListener('DOMContentLoaded', () => {
         initEventsSync();
         initGuestsSync();
         initAnnouncementsSync();
-        
+        initDecorationPhotosSync();
+
         // Load initial data
         initializeFromFirebase();
-        
+
         console.log("🔥 Firebase real-time sync initialized!");
     }
 });
@@ -422,24 +539,30 @@ window.firebaseSync = {
     getSyncStatus,
     isConfigured: () => isFirebaseConfigured,
     isConnected: () => firebaseInitialized && connectionStatus === 'connected',
-    
+
     // Task operations
     markTaskComplete: syncMarkTaskComplete,
     addCustomTask: syncAddCustomTask,
     deleteCustomTask: syncDeleteCustomTask,
-    
+
     // Event operations
     syncEvent,
-    
+
     // Guest operations
     syncGuest,
-    
+
     // Announcements
     sendAnnouncement: syncSendAnnouncement,
-    
+
+    // Decoration photos
+    uploadDecorationPhoto: syncUploadDecorationPhoto,
+    deleteDecorationPhoto: syncDeleteDecorationPhoto,
+    getDecorationPhotos: getDecorationPhotos,
+    getAllDecorationPhotos: getAllDecorationPhotos,
+
     // Activity logging
     logActivity,
-    
+
     // Setup
     pushAllDataToFirebase,
     initializeFromFirebase
@@ -448,3 +571,5 @@ window.firebaseSync = {
 // Also expose individual functions
 window.getSyncStatus = getSyncStatus;
 window.updateSyncStatusUI = updateSyncStatusUI;
+window.getDecorationPhotos = getDecorationPhotos;
+window.getAllDecorationPhotos = getAllDecorationPhotos;

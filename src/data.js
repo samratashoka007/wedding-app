@@ -504,7 +504,15 @@ const WEDDING_DATA = {
             phone: "9106704218",
             phone2: "7802903232",
             poc: "Vicky",
-            backup: "Jay"
+            backup: "Jay",
+            commitments: [
+                "Space/Power/Staff/Decor-Caterer escalation point",
+                "Resort policy enforcement"
+            ],
+            commitmentsHindi: [
+                "स्पेस/पावर/स्टाफ/डेकोर-कैटरर की बड़ी एस्केलेशन",
+                "रिसोर्ट पॉलिसी लागू"
+            ]
         },
         {
             area: "Decoration + DJ",
@@ -513,7 +521,17 @@ const WEDDING_DATA = {
             contact: "Nishant Patel",
             phone: "9664962577",
             poc: "Vicky",
-            backup: "Preyarsh"
+            backup: "Preyarsh (only for Sangeet DJ sync)",
+            commitments: [
+                "Stage/Sound/Light/Tables as per package",
+                "Generator (without diesel) - Resort will provide diesel",
+                "Extra material = extra cost"
+            ],
+            commitmentsHindi: [
+                "पैकेज के अनुसार स्टेज/साउंड/लाइट/टेबल्स",
+                "जनरेटर (डीजल के बिना) - डीजल रिसोर्ट देगा",
+                "एक्स्ट्रा मटेरियल एक्स्ट्रा"
+            ]
         },
         {
             area: "Caterer",
@@ -522,7 +540,19 @@ const WEDDING_DATA = {
             contact: "Babubhai",
             phone: "8530045450",
             poc: "Jay",
-            backup: "Vicky"
+            backup: "Vicky",
+            commitments: [
+                "Time Slots:",
+                "  24th: Tea (Breakfast+Tea): 10:30 AM, Lunch: 12:00 PM, Tea: 4:00 PM, Dinner: 8:00 PM",
+                "  25th: Breakfast+Tea: 8:00 AM, Lunch: 12:00 PM, Tea: 4:00 PM, Dinner: 8:00 PM",
+                "Excluded (if requested): VIP waiters, disposable items"
+            ],
+            commitmentsHindi: [
+                "टाइम स्लॉट:",
+                "  24th: चाय (Breakfast + Tea): 10:30 AM, लंच: 12:00 PM, चाय: 4:00 PM, डिनर: 8:00 PM",
+                "  25th: ब्रेकफास्ट + चाय: 8:00 AM, लंच: 12:00 PM, चाय: 4:00 PM, डिनर: 8:00 PM",
+                "एक्सक्लूडेड (अगर मांगा): VIP waiters, disposable items"
+            ]
         },
         {
             area: "Dhol Company",
@@ -531,7 +561,36 @@ const WEDDING_DATA = {
             contact: "Ranjit Bhatt",
             phone: "9974817599",
             poc: "Hardik",
-            backup: "Jay"
+            backup: "Jay",
+            commitments: [
+                "Commitment (as per bill):",
+                "  24th: 2 Dhol, 11:00 AM – 6:00 PM",
+                "  25th: 2 Dhol, 10:00 AM – 12:30 PM AND 6 Dhol Baraat from 4:30 PM"
+            ],
+            commitmentsHindi: [
+                "कमिटमेंट (बिल अनुसार):",
+                "  24th: 2 ढोल, 11:00 AM – 6:00 PM",
+                "  25th: 2 ढोल, 10:00 AM – 12:30 PM और 6 ढोल बारात 4:30 PM से"
+            ]
+        },
+        {
+            area: "Maharaj",
+            areaHindi: "महाराज",
+            days: "24-25 Natraj",
+            contact: "Nilesh Bhai",
+            phone: "9898641305",
+            poc: "Jay",
+            backup: "Mukesh (Uncle)",
+            commitments: [
+                "Ganesh Sthapana, Mandap Muhurat, Mamera, Vivah",
+                "Will arrive on 24th at 9:00 AM",
+                "Team will stay at the resort"
+            ],
+            commitmentsHindi: [
+                "गणेश स्थापना, मंडप मुहूर्त, मामेरा, विवाह",
+                "24th को 9:00 AM पहुँचेंगे",
+                "टीम रिसोर्ट में रुकेगी"
+            ]
         },
         {
             area: "Photography",
@@ -540,8 +599,20 @@ const WEDDING_DATA = {
             contact: "Harshal Sevak",
             phone: "6354381571",
             phone2: "7383528083",
-            poc: "Jay",
-            backup: "Vicky"
+            poc: "Jay (Logistics only)",
+            backup: "Vicky",
+            commitments: [
+                "4 members",
+                "Own car",
+                "24-25 Resort stay",
+                "Timing as per function schedule"
+            ],
+            commitmentsHindi: [
+                "4 सदस्य",
+                "खुद की कार",
+                "24–25 रिसोर्ट स्टे",
+                "टाइमिंग फंक्शन शेड्यूल के अनुसार"
+            ]
         },
         {
             area: "Saafa Artist",
@@ -550,7 +621,61 @@ const WEDDING_DATA = {
             contact: "Siddhrajsinh Bihola",
             phone: "6355255006",
             poc: "Jay",
-            backup: "Priyanshu"
+            backup: "Priyanshu",
+            commitments: [
+                "25 Jan 8:30 AM",
+                "40 persons",
+                "₹110/person",
+                "Contact person: Nishant (Decor)"
+            ],
+            commitmentsHindi: [
+                "25 Jan 8:30 AM",
+                "40 लोग",
+                "₹110/व्यक्ति",
+                "संपर्क व्यक्ति: Nishant (Decor)"
+            ]
+        },
+        {
+            area: "Makeup (Bride side)",
+            areaHindi: "मेकअप (Bride side)",
+            days: "24-26",
+            contact: "Preeti (Contact via Neha)",
+            phone: "Contact Neha",
+            poc: "Pooja + Himani",
+            backup: "Jay",
+            commitments: [
+                "Timing:",
+                "  24th: 11:00 AM",
+                "  25th: 8:00 AM and 1:00 PM",
+                "  26th: 4:00 PM",
+                "Team of 2 people",
+                "Ready: Bride + Pooja + Both Mothers (4 people)"
+            ],
+            commitmentsHindi: [
+                "टाइमिंग:",
+                "  24th: 11:00 AM",
+                "  25th: 8:00 AM और 1:00 PM",
+                "  26th: 4:00 PM",
+                "टीम 2 लोग",
+                "तैयार: Bride + Pooja + दोनों माँ (4 लोग)"
+            ]
+        },
+        {
+            area: "26 Banquet",
+            areaHindi: "26 बैंकेट",
+            days: "26 Grand Neelkanth",
+            contact: "Banquet",
+            phone: "9898244429",
+            poc: "Jayant Chauhan",
+            backup: "Priyanshu",
+            commitments: [
+                "7:00 PM – 10:30 PM Operations",
+                "Manage vendor/staff from there"
+            ],
+            commitmentsHindi: [
+                "7:00 PM – 10:30 PM ऑप्स",
+                "वेंडर/स्टाफ को वहीं से चलाना"
+            ]
         },
         {
             area: "26 Decor",
@@ -559,7 +684,32 @@ const WEDDING_DATA = {
             contact: "Bhardwaj Decorations",
             phone: "7043327401",
             poc: "Jayant Chauhan",
-            backup: "Priyanshu"
+            backup: "Priyanshu",
+            commitments: [
+                "Reception Decor + Follow venue rules",
+                "Ready before 7:00 PM"
+            ],
+            commitmentsHindi: [
+                "रिसेप्शन डेकोर + वेन्यू रूल्स फॉलो",
+                "7:00 PM से पहले रेडी"
+            ]
+        },
+        {
+            area: "Travel (Bus)",
+            areaHindi: "ट्रैवल (बस)",
+            days: "24/26",
+            contact: "Pending",
+            phone: "TBD",
+            poc: "Hardik",
+            backup: "Vicky",
+            commitments: [
+                "24th: 8:30 AM pickup (2 buses, 52 seater, 30 min buffer)",
+                "26th: 10:30 AM resort to houses, intermediate drop route"
+            ],
+            commitmentsHindi: [
+                "24th: 8:30 AM pickup (2 बस, 52 सीटर, 30 min buffer)",
+                "26th: 10:30 AM रिसोर्ट से घर, intermediate drop route"
+            ]
         }
     ],
 
@@ -1143,7 +1293,7 @@ const ALL_TASKS = [
 // Helper to get tasks for a specific coordinator
 function getCoordinatorAllTasks(coordinatorName) {
     const name = coordinatorName.toLowerCase();
-    
+
     // Helper to check if names match (handles partial names like "Pooja" vs "Pooja Nagar" and "Pooja/Himani")
     const namesMatch = (taskName, coordName) => {
         if (!taskName) return false;
@@ -1156,7 +1306,7 @@ function getCoordinatorAllTasks(coordinatorName) {
         // Check both directions: "pooja" in "pooja nagar" OR "pooja nagar" in "pooja"
         return coordName.includes(taskLower) || taskLower.includes(coordName);
     };
-    
+
     // Get tasks from the main task list
     const mainTasks = ALL_TASKS.filter(task => {
         const isOwner = namesMatch(task.owner, name);
@@ -1166,9 +1316,9 @@ function getCoordinatorAllTasks(coordinatorName) {
     }).map(task => ({
         ...task,
         role: namesMatch(task.owner, name) ? 'owner' :
-              namesMatch(task.crowdLead, name) ? 'crowdLead' : 'support'
+            namesMatch(task.crowdLead, name) ? 'crowdLead' : 'support'
     }));
-    
+
     // Get custom tasks added by admin
     const customTasks = JSON.parse(localStorage.getItem('customTasks') || '[]');
     const myCustomTasks = customTasks.filter(task => {
@@ -1185,7 +1335,7 @@ function getCoordinatorAllTasks(coordinatorName) {
             else if (dayOfMonth < 24) day = 'Pre-Wedding';
             else day = 'Day 3'; // after wedding
         }
-        
+
         return {
             ...task,
             id: task.id || Date.now(),
@@ -1200,7 +1350,7 @@ function getCoordinatorAllTasks(coordinatorName) {
             priority: task.priority || 'medium'
         };
     });
-    
+
     // Combine and return all tasks
     return [...mainTasks, ...myCustomTasks];
 }
@@ -1328,7 +1478,7 @@ function addPreWeddingTask(task) {
     saveEditableData(editableData);
     // Sync to Firebase
     if (window.firebaseSync && window.firebaseSync.addCustomTask) {
-        window.firebaseSync.addCustomTask({...task, type: 'pre-wedding'});
+        window.firebaseSync.addCustomTask({ ...task, type: 'pre-wedding' });
     }
     return task.id;
 }
@@ -1500,14 +1650,14 @@ function setCoordinatorOTP(coordinatorName, otp) {
 
 function verifyCoordinatorOTP(coordinatorName, otp) {
     const inputOTP = otp ? otp.toString().trim() : '';
-    
+
     // First check default OTPs (these are consistent across all devices)
     const defaultOTP = DEFAULT_COORDINATOR_OTPS[coordinatorName];
-    
+
     // Then check localStorage OTPs (for custom coordinators or admin-changed OTPs)
     const localOTPs = getCoordinatorOTPs();
     const localOTP = localOTPs[coordinatorName];
-    
+
     // Debug logging for troubleshooting
     console.log('OTP Verification:', {
         coordinatorName: coordinatorName,
@@ -1515,7 +1665,7 @@ function verifyCoordinatorOTP(coordinatorName, otp) {
         defaultOTP: defaultOTP,
         localOTP: localOTP
     });
-    
+
     // Accept either default OTP or locally stored OTP
     if (defaultOTP && defaultOTP.toString().trim() === inputOTP) {
         console.log('✅ Matched default OTP');
@@ -1525,7 +1675,7 @@ function verifyCoordinatorOTP(coordinatorName, otp) {
         console.log('✅ Matched local OTP');
         return true;
     }
-    
+
     console.log('❌ OTP did not match');
     return false;
 }

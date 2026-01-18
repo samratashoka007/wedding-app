@@ -218,7 +218,7 @@ const TRANSLATIONS = {
         pleaseContactCoordinator: "Please contact a coordinator.",
         arriveOnTime: "Please arrive at the pickup point on time. The bus will not wait.",
         day1: "Day 1",
-        day2: "Day 2", 
+        day2: "Day 2",
         day3: "Day 3",
         allDays: "All Days",
         tasksLabel: "tasks",
@@ -227,7 +227,25 @@ const TRANSLATIONS = {
         manageTasksTitle: "Manage Tasks",
         addPreWeddingTask: "Add Pre-Wedding Task",
         vendorDirectory: "Vendor Directory",
-        poc: "POC"
+        poc: "POC",
+        backup: "Backup",
+        commitments: "Commitments",
+        vendorCommitmentsNote: "Vendor commitments reference for POC coordinators",
+
+        // Decoration Photos
+        decorationPhotos: "Decoration Reference Photos",
+        decorationPhotosDesc: "Upload committed decoration photos for coordinators to reference",
+        decorationPhotosGalleryDesc: "Committed decoration designs for reference",
+        selectEvent: "Select Event/Area",
+        photoCaption: "Photo caption (optional)",
+        uploadPhoto: "Upload Photo",
+        uploadedPhotos: "Uploaded Photos",
+        noPhotosYet: "No decoration photos uploaded yet",
+        pleaseSelectEvent: "Please select an event/area",
+        pleaseSelectPhoto: "Please select a photo to upload",
+        uploading: "Uploading...",
+        photoUploaded: "Photo uploaded successfully!",
+        confirmDeletePhoto: "Are you sure you want to delete this photo?"
     },
 
     hi: {
@@ -455,7 +473,25 @@ const TRANSLATIONS = {
         manageTasksTitle: "कार्य प्रबंधित करें",
         addPreWeddingTask: "शादी से पहले का कार्य जोड़ें",
         vendorDirectory: "वेंडर डायरेक्टरी",
-        poc: "संपर्क व्यक्ति"
+        poc: "संपर्क व्यक्ति",
+        backup: "बैकअप",
+        commitments: "कमिटमेंट/रेफरेंस",
+        vendorCommitmentsNote: "POC कोऑर्डिनेटर के लिए वेंडर कमिटमेंट रेफरेंस",
+
+        // Decoration Photos
+        decorationPhotos: "डेकोरेशन रेफरेंस फोटो",
+        decorationPhotosDesc: "कोऑर्डिनेटर्स के लिए कमिटेड डेकोरेशन फोटो अपलोड करें",
+        decorationPhotosGalleryDesc: "रेफरेंस के लिए कमिटेड डेकोरेशन डिज़ाइन",
+        selectEvent: "इवेंट/एरिया चुनें",
+        photoCaption: "फोटो कैप्शन (वैकल्पिक)",
+        uploadPhoto: "फोटो अपलोड करें",
+        uploadedPhotos: "अपलोड किए गए फोटो",
+        noPhotosYet: "अभी तक कोई डेकोरेशन फोटो अपलोड नहीं की गई",
+        pleaseSelectEvent: "कृपया इवेंट/एरिया चुनें",
+        pleaseSelectPhoto: "कृपया अपलोड करने के लिए फोटो चुनें",
+        uploading: "अपलोड हो रहा है...",
+        photoUploaded: "फोटो सफलतापूर्वक अपलोड हो गया!",
+        confirmDeletePhoto: "क्या आप इस फोटो को हटाना चाहते हैं?"
     },
 
     gu: {
@@ -683,7 +719,25 @@ const TRANSLATIONS = {
         manageTasksTitle: "કાર્યો મેનેજ કરો",
         addPreWeddingTask: "લગ્ન પહેલાનું કાર્ય ઉમેરો",
         vendorDirectory: "વેન્ડર ડિરેક્ટરી",
-        poc: "સંપર્ક વ્યક્તિ"
+        poc: "સંપર્ક વ્યક્તિ",
+        backup: "બેકઅપ",
+        commitments: "કમિટમેન્ટ/રેફરન્સ",
+        vendorCommitmentsNote: "POC કોઓર્ડિનેટર માટે વેન્ડર કમિટમેન્ટ રેફરન્સ",
+
+        // Decoration Photos
+        decorationPhotos: "ડેકોરેશન રેફરન્સ ફોટો",
+        decorationPhotosDesc: "કોઓર્ડિનેટર્સ માટે કમિટેડ ડેકોરેશન ફોટો અપલોડ કરો",
+        decorationPhotosGalleryDesc: "રેફરન્સ માટે કમિટેડ ડેકોરેશન ડિઝાઇન",
+        selectEvent: "ઇવેન્ટ/એરિયા પસંદ કરો",
+        photoCaption: "ફોટો કેપ્શન (વૈકલ્પિક)",
+        uploadPhoto: "ફોટો અપલોડ કરો",
+        uploadedPhotos: "અપલોડ કરેલા ફોટો",
+        noPhotosYet: "હજુ સુધી કોઈ ડેકોરેશન ફોટો અપલોડ થયા નથી",
+        pleaseSelectEvent: "કૃપયા ઇવેન્ટ/એરિયા પસંદ કરો",
+        pleaseSelectPhoto: "કૃપયા અપલોડ કરવા માટે ફોટો પસંદ કરો",
+        uploading: "અપલોડ થઈ રહ્યું છે...",
+        photoUploaded: "ફોટો સફળતાપૂર્વક અપલોડ થયો!",
+        confirmDeletePhoto: "શું તમે આ ફોટો કાઢી નાખવા માંગો છો?"
     }
 };
 

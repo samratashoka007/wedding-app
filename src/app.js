@@ -28,14 +28,14 @@ function getWeddingCountdown() {
   const weddingDate = new Date('2026-01-24T00:00:00+05:30');
   const now = new Date();
   const diff = weddingDate - now;
-  
+
   if (diff <= 0) return { days: 0, hours: 0, minutes: 0, text: 'Wedding Day!' };
-  
+
   const days = Math.floor(diff / (1000 * 60 * 60 * 24));
   const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
   const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-  
-  return { 
+
+  return {
     days, hours, minutes,
     text: `${days}d ${hours}h ${minutes}m until wedding`
   };
@@ -49,7 +49,7 @@ function formatDueDate(dateStr) {
   today.setHours(0, 0, 0, 0);
   const tomorrow = new Date(today);
   tomorrow.setDate(tomorrow.getDate() + 1);
-  
+
   if (date < today) return `⚠️ Overdue (${date.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })})`;
   if (date.toDateString() === today.toDateString()) return '📌 Today';
   if (date.toDateString() === tomorrow.toDateString()) return '📅 Tomorrow';
@@ -415,7 +415,7 @@ function checkUpcomingEvents() {
     .filter(e => e.category === 'main' || e.category === 'meal')
     .slice(0, 3);
 
-  if (upcomingEvents.length> 0 && !sessionStorage.getItem('reminderShown')) {
+  if (upcomingEvents.length > 0 && !sessionStorage.getItem('reminderShown')) {
     sessionStorage.setItem('reminderShown', 'true');
     const nextEvent = upcomingEvents[0];
     if (Notification.permission === 'granted') {
@@ -437,7 +437,7 @@ function requestNotificationPermission() {
 // Toggle reminder
 function toggleReminder(eventId) {
   const idx = reminders.indexOf(eventId);
-  if (idx> -1) {
+  if (idx > -1) {
     reminders.splice(idx, 1);
   } else {
     reminders.push(eventId);
@@ -452,7 +452,7 @@ function renderDashboard() {
   const app = document.getElementById('app');
   const roleLabel = t(currentUser.role);
   const syncStatus = window.firebaseSync ? window.firebaseSync.getSyncStatus() : { isFirebaseConnected: false };
-  
+
   // Get any announcements
   const announcements = JSON.parse(localStorage.getItem('announcements') || '[]');
   const latestAnnouncement = announcements.length > 0 ? announcements[0] : null;
@@ -647,7 +647,7 @@ function renderMyTasks() {
 
   // Get ALL tasks assigned to this coordinator across all days
   const myTasks = getCoordinatorAllTasks(coord.name);
-  
+
   // Group tasks by day (including custom tasks and pre-wedding)
   const tasksByDay = {
     'Pre-Wedding': myTasks.filter(t => t.day === 'Pre-Wedding'),
@@ -761,7 +761,7 @@ function renderTaskCard(task) {
   const roleClass = task.role === 'owner' ? 'role-owner' : task.role === 'crowdLead' ? 'role-crowd' : 'role-support';
   const roleLabel = task.role === 'owner' ? '👑 Owner' : task.role === 'crowdLead' ? '👥 Crowd Lead' : '🤝 Support';
   const priorityClass = task.priority === 'critical' ? 'priority-critical' : task.priority === 'high' ? 'priority-high' : 'priority-medium';
-  
+
   return `
     <div class="task-card ${isCompleted ? 'completed' : ''} ${priorityClass}" data-task-id="${task.id}">
       <div class="task-card-header">
@@ -799,20 +799,20 @@ function renderTaskCard(task) {
 function toggleTaskById(taskId) {
   const taskIdStr = taskId.toString();
   const isCompleting = !completedTasks.includes(taskIdStr);
-  
+
   if (isCompleting) {
     completedTasks.push(taskIdStr);
   } else {
     completedTasks = completedTasks.filter(t => t !== taskIdStr);
   }
-  
+
   // Sync to Firebase (will also save to localStorage)
   if (window.firebaseSync && window.firebaseSync.markTaskComplete) {
     window.firebaseSync.markTaskComplete(taskIdStr, isCompleting);
   } else {
     localStorage.setItem('completedTasks', JSON.stringify(completedTasks));
   }
-  
+
   renderDashboard();
 }
 
@@ -826,14 +826,14 @@ function renderPreWeddingTasks(tasks, coord) {
   // Categorize tasks
   const overdue = sortedTasks.filter(t => t.dueDate < today && !completedTasks.includes(t.task));
   const dueToday = sortedTasks.filter(t => t.dueDate === today && !completedTasks.includes(t.task));
-  const upcoming = sortedTasks.filter(t => t.dueDate> today && !completedTasks.includes(t.task));
+  const upcoming = sortedTasks.filter(t => t.dueDate > today && !completedTasks.includes(t.task));
   const completed = sortedTasks.filter(t => completedTasks.includes(t.task));
 
   return `
     <div class="my-tasks">
       <h3>📋 ${t('preWeddingTasks')} (${tasks.length - completed.length} ${t('pending')})</h3>
       
-      ${overdue.length> 0 ? `
+      ${overdue.length > 0 ? `
         <div class="task-group overdue">
           <h4>⚠️ ${t('overdue')}</h4>
           ${overdue.map(task => renderPreWeddingTaskItem(task)).join('')}
@@ -841,7 +841,7 @@ function renderPreWeddingTasks(tasks, coord) {
       ` : ''
     }
       
-      ${dueToday.length> 0 ? `
+      ${dueToday.length > 0 ? `
         <div class="task-group today">
           <h4>📌 ${t('dueToday')}</h4>
           ${dueToday.map(task => renderPreWeddingTaskItem(task)).join('')}
@@ -849,7 +849,7 @@ function renderPreWeddingTasks(tasks, coord) {
       ` : ''
     }
       
-      ${upcoming.length> 0 ? `
+      ${upcoming.length > 0 ? `
         <div class="task-group upcoming">
           <h4>📅 ${t('upcoming')}</h4>
           ${upcoming.map(task => renderPreWeddingTaskItem(task)).join('')}
@@ -857,7 +857,7 @@ function renderPreWeddingTasks(tasks, coord) {
       ` : ''
     }
       
-      ${completed.length> 0 ? `
+      ${completed.length > 0 ? `
         <div class="task-group completed">
           <h4>✅ ${t('completed')} (${completed.length})</h4>
           ${completed.map(task => renderPreWeddingTaskItem(task, true)).join('')}
@@ -925,7 +925,7 @@ function renderDayTasks(tasks, phase, coord) {
     <div class="my-tasks">
       <h3>🕐 ${t('yourTasksForDay')} ${dayNum} (${tasks.length} ${t('tasksLabel')})</h3>
       
-      ${tasks.length> 0 ? tasks.map(task => `
+      ${tasks.length > 0 ? tasks.map(task => `
         <div class="task-item day-task ${completedTasks.includes(task.task) ? 'done' : ''}">
           <div class="task-checkbox ${completedTasks.includes(task.task) ? 'checked' : ''}" 
                onclick="toggleTask('${task.task.replace(/'/g, "\\'")}')"></div>
@@ -968,20 +968,20 @@ let selectedPreviewDay = null;
 // Toggle Task (with Firebase sync)
 function toggleTask(task) {
   const isCompleting = !completedTasks.includes(task);
-  
+
   if (isCompleting) {
     completedTasks.push(task);
   } else {
     completedTasks = completedTasks.filter(t => t !== task);
   }
-  
+
   // Sync to Firebase (will also save to localStorage)
   if (window.firebaseSync && window.firebaseSync.markTaskComplete) {
     window.firebaseSync.markTaskComplete(task, isCompleting);
   } else {
     localStorage.setItem('completedTasks', JSON.stringify(completedTasks));
   }
-  
+
   renderDashboard();
 }
 
@@ -1061,7 +1061,7 @@ function renderEventsTabGuest() {
             <span class="event-emoji">${event.emoji}</span>
             <div class="event-header-right">
               <span class="event-time-badge">${event.time}</span>
-              ${event.reminderBefore> 0 ? `
+              ${event.reminderBefore > 0 ? `
                 <button class="reminder-btn ${reminders.includes(event.id) ? 'active' : ''}" 
                         onclick="toggleReminder(${event.id})">
                   ${reminders.includes(event.id) ? '🔔' : '🔕'}
@@ -1247,15 +1247,20 @@ function renderMealsTab() {
 
 // Render Vendors Tab (Coordinator Only)
 function renderVendorsTab() {
+  const lang = currentLanguage;
+  const allPhotos = window.getAllDecorationPhotos ? window.getAllDecorationPhotos() : [];
+
   return `
     <div class="section-header">
       <span class="emoji">📞</span>
       <h2>${t('vendors')}</h2>
     </div>
+    
+    <p class="vendor-intro">${t('vendorCommitmentsNote') || 'Vendor commitments reference for POC coordinators'}</p>
 
     ${WEDDING_DATA.vendors.map(vendor => `
-      <div class="vendor-card">
-        <h3 class="vendor-area">${vendor.area}</h3>
+      <div class="vendor-card ${vendor.area.includes('Decoration') ? 'decoration-vendor' : ''}">
+        <h3 class="vendor-area">${lang === 'hi' && vendor.areaHindi ? vendor.areaHindi : vendor.area}</h3>
         <p class="vendor-days">📅 ${vendor.days}</p>
         <div class="vendor-contact">
           <p class="vendor-name">${vendor.contact}</p>
@@ -1263,6 +1268,36 @@ function renderVendorsTab() {
           ${vendor.phone2 ? `<a href="tel:${vendor.phone2}" class="call-btn">📞 ${vendor.phone2}</a>` : ''}
         </div>
         <p class="vendor-poc"><strong>POC:</strong> ${vendor.poc}</p>
+        <p class="vendor-backup"><strong>${t('backup') || 'Backup'}:</strong> ${vendor.backup}</p>
+        ${vendor.commitments && vendor.commitments.length > 0 ? `
+          <div class="vendor-commitments">
+            <p class="commitments-title"><strong>📋 ${t('commitments') || 'Commitments'}:</strong></p>
+            <ul class="commitments-list">
+              ${(lang === 'hi' && vendor.commitmentsHindi ? vendor.commitmentsHindi : vendor.commitments).map(c => `
+                <li>${c}</li>
+              `).join('')}
+            </ul>
+          </div>
+        ` : ''}
+        
+        ${vendor.area.includes('Decoration') && allPhotos.length > 0 ? `
+          <!-- Decoration Photos Gallery for Coordinators -->
+          <div class="decoration-photos-gallery">
+            <h4>📸 ${t('decorationPhotos') || 'Decoration Reference Photos'}</h4>
+            <p class="gallery-desc">${t('decorationPhotosGalleryDesc') || 'Committed decoration designs for reference'}</p>
+            <div class="photos-gallery coordinator">
+              ${allPhotos.map(photo => `
+                <div class="photo-card" onclick="openPhotoModal('${photo.id}', '${photo.eventName}')">
+                  <img src="${photo.data}" alt="${photo.caption || photo.eventName}" />
+                  <div class="photo-info">
+                    <span class="photo-event">${photo.eventName}</span>
+                    ${photo.caption ? `<span class="photo-caption">${photo.caption}</span>` : ''}
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        ` : ''}
       </div>
     `).join('')
     }
@@ -1544,27 +1579,207 @@ function renderAdminTasks() {
 
 // Admin Vendors
 function renderAdminVendors() {
+  const lang = currentLanguage;
+  const allPhotos = window.getAllDecorationPhotos ? window.getAllDecorationPhotos() : [];
+
+  // Define decoration-related events for photo upload
+  const decorationEvents = [
+    { id: 'haldi', name: 'Haldi/Pithi', nameHi: 'हल्दी/पीठी' },
+    { id: 'sangeet', name: 'Sangeet Stage', nameHi: 'संगीत स्टेज' },
+    { id: 'mandap', name: 'Mandap/Wedding Stage', nameHi: 'मंडप/विवाह स्टेज' },
+    { id: 'reception', name: 'Reception Stage', nameHi: 'रिसेप्शन स्टेज' },
+    { id: 'entrance', name: 'Entrance/Gate', nameHi: 'एंट्रेंस/गेट' },
+    { id: 'dining', name: 'Dining Area', nameHi: 'डाइनिंग एरिया' },
+    { id: 'photo_booth', name: 'Photo Booth', nameHi: 'फोटो बूथ' },
+    { id: 'other', name: 'Other', nameHi: 'अन्य' }
+  ];
+
   return `
     <div class="section-header">
       <span class="emoji">📞</span>
       <h2>${t('vendorDirectory')}</h2>
     </div>
+    
+    <p style="color:#666;margin-bottom:1rem;font-size:0.9rem;">${t('vendorCommitmentsNote') || 'Complete vendor directory with commitments for POC coordinators'}</p>
 
     ${WEDDING_DATA.vendors.map(vendor => `
-      <div class="admin-vendor-card">
+      <div class="admin-vendor-card ${vendor.area.includes('Decoration') ? 'decoration-vendor' : ''}">
         <div class="vendor-header">
-          <h4>${vendor.area}</h4>
+          <h4>${lang === 'hi' && vendor.areaHindi ? vendor.areaHindi : vendor.area}</h4>
           <span class="vendor-days">${vendor.days}</span>
         </div>
         <div class="vendor-contact-row">
           <span>${vendor.contact}</span>
           <a href="tel:${vendor.phone}" class="call-btn-small">📞 ${vendor.phone}</a>
+          ${vendor.phone2 ? `<a href="tel:${vendor.phone2}" class="call-btn-small">📞 ${vendor.phone2}</a>` : ''}
         </div>
-        <div class="vendor-poc">${t('poc')}: ${vendor.poc}</div>
+        <div class="vendor-poc-row">
+          <span><strong>${t('poc')}:</strong> ${vendor.poc}</span>
+          <span><strong>${t('backup') || 'Backup'}:</strong> ${vendor.backup}</span>
+        </div>
+        ${vendor.commitments && vendor.commitments.length > 0 ? `
+          <div class="vendor-commitments admin">
+            <p class="commitments-title"><strong>📋 ${t('commitments') || 'Commitments/Reference'}:</strong></p>
+            <ul class="commitments-list">
+              ${(lang === 'hi' && vendor.commitmentsHindi ? vendor.commitmentsHindi : vendor.commitments).map(c => `
+                <li>${c}</li>
+              `).join('')}
+            </ul>
+          </div>
+        ` : ''}
+        
+        ${vendor.area.includes('Decoration') ? `
+          <!-- Decoration Photos Section -->
+          <div class="decoration-photos-section">
+            <h4>📸 ${t('decorationPhotos') || 'Decoration Reference Photos'}</h4>
+            <p class="photo-section-desc">${t('decorationPhotosDesc') || 'Upload committed decoration photos for coordinators to reference'}</p>
+            
+            <!-- Upload Form -->
+            <div class="photo-upload-form">
+              <select id="decorEventSelect" class="form-select">
+                <option value="">${t('selectEvent') || 'Select Event/Area'}</option>
+                ${decorationEvents.map(event => `
+                  <option value="${event.id}">${lang === 'hi' ? event.nameHi : event.name}</option>
+                `).join('')}
+              </select>
+              <input type="text" id="decorPhotoCaption" placeholder="${t('photoCaption') || 'Photo caption (optional)'}" class="form-input" />
+              <input type="file" id="decorPhotoInput" accept="image/*" class="form-file-input" onchange="handleDecorationPhotoSelect(event)" />
+              <button class="upload-btn" onclick="uploadDecorationPhoto()">
+                📤 ${t('uploadPhoto') || 'Upload Photo'}
+              </button>
+            </div>
+            
+            <!-- Existing Photos -->
+            <div class="decoration-photos-grid">
+              ${allPhotos.length > 0 ? `
+                <h5>📷 ${t('uploadedPhotos') || 'Uploaded Photos'} (${allPhotos.length})</h5>
+                <div class="photos-gallery">
+                  ${allPhotos.map(photo => `
+                    <div class="photo-card">
+                      <img src="${photo.data}" alt="${photo.caption || photo.eventName}" onclick="openPhotoModal('${photo.id}', '${photo.eventName}')" />
+                      <div class="photo-info">
+                        <span class="photo-event">${photo.eventName}</span>
+                        ${photo.caption ? `<span class="photo-caption">${photo.caption}</span>` : ''}
+                      </div>
+                      <button class="delete-photo-btn" onclick="deleteDecorationPhoto('${photo.eventName}', '${photo.id}')">🗑️</button>
+                    </div>
+                  `).join('')}
+                </div>
+              ` : `
+                <div class="no-photos">
+                  <span>📷</span>
+                  <p>${t('noPhotosYet') || 'No decoration photos uploaded yet'}</p>
+                </div>
+              `}
+            </div>
+          </div>
+        ` : ''}
       </div>
     `).join('')
     }
   `;
+}
+
+// Handle decoration photo selection
+let selectedDecorationFile = null;
+function handleDecorationPhotoSelect(event) {
+  const file = event.target.files[0];
+  if (file) {
+    // Validate file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      alert('File size must be less than 5MB');
+      event.target.value = '';
+      return;
+    }
+    selectedDecorationFile = file;
+  }
+}
+
+// Upload decoration photo
+async function uploadDecorationPhoto() {
+  const eventSelect = document.getElementById('decorEventSelect');
+  const captionInput = document.getElementById('decorPhotoCaption');
+  const fileInput = document.getElementById('decorPhotoInput');
+
+  if (!eventSelect.value) {
+    alert(t('pleaseSelectEvent') || 'Please select an event/area');
+    return;
+  }
+
+  if (!selectedDecorationFile) {
+    alert(t('pleaseSelectPhoto') || 'Please select a photo to upload');
+    return;
+  }
+
+  // Show loading
+  const uploadBtn = document.querySelector('.upload-btn');
+  const originalText = uploadBtn.innerHTML;
+  uploadBtn.innerHTML = '⏳ ' + (t('uploading') || 'Uploading...');
+  uploadBtn.disabled = true;
+
+  try {
+    const result = await window.firebaseSync.uploadDecorationPhoto(
+      selectedDecorationFile,
+      eventSelect.options[eventSelect.selectedIndex].text,
+      captionInput.value
+    );
+
+    if (result) {
+      // Reset form
+      eventSelect.value = '';
+      captionInput.value = '';
+      fileInput.value = '';
+      selectedDecorationFile = null;
+
+      alert(t('photoUploaded') || 'Photo uploaded successfully!');
+      renderDashboard();
+    }
+  } catch (error) {
+    console.error('Upload error:', error);
+    alert('Upload failed: ' + error.message);
+  } finally {
+    uploadBtn.innerHTML = originalText;
+    uploadBtn.disabled = false;
+  }
+}
+
+// Delete decoration photo
+async function deleteDecorationPhoto(eventName, photoId) {
+  if (!confirm(t('confirmDeletePhoto') || 'Are you sure you want to delete this photo?')) {
+    return;
+  }
+
+  const result = await window.firebaseSync.deleteDecorationPhoto(eventName, photoId);
+  if (result) {
+    renderDashboard();
+  }
+}
+
+// Open photo in modal
+function openPhotoModal(photoId, eventName) {
+  const photos = window.getAllDecorationPhotos ? window.getAllDecorationPhotos() : [];
+  const photo = photos.find(p => p.id === photoId);
+
+  if (photo) {
+    // Create modal
+    const modal = document.createElement('div');
+    modal.className = 'photo-modal';
+    modal.innerHTML = `
+      <div class="photo-modal-content">
+        <button class="close-modal" onclick="this.parentElement.parentElement.remove()">✕</button>
+        <img src="${photo.data}" alt="${photo.caption || photo.eventName}" />
+        <div class="modal-info">
+          <h4>${photo.eventName}</h4>
+          ${photo.caption ? `<p>${photo.caption}</p>` : ''}
+          <small>Uploaded by ${photo.uploadedBy} on ${new Date(photo.uploadedAt).toLocaleDateString()}</small>
+        </div>
+      </div>
+    `;
+    modal.onclick = (e) => {
+      if (e.target === modal) modal.remove();
+    };
+    document.body.appendChild(modal);
+  }
 }
 
 // Admin Settings
@@ -1601,9 +1816,9 @@ function renderAdminSettings() {
           <div class="sync-status-details">
             <strong>${syncStatus.isFirebaseConnected ? 'Live Sync Active' : 'Offline Mode'}</strong>
             <span class="sync-subtitle">
-              ${syncStatus.isFirebaseConnected 
-                ? 'All changes sync instantly across all devices' 
-                : 'Changes are saved locally only'}
+              ${syncStatus.isFirebaseConnected
+      ? 'All changes sync instantly across all devices'
+      : 'Changes are saved locally only'}
             </span>
           </div>
         </div>
@@ -1902,7 +2117,7 @@ function copyAppLink() {
 function shareAppLink() {
   const appLink = window.location.origin + window.location.pathname;
   const shareText = `💒 Install the Wedding App!\n\nUse this link to install the app on your phone:\n${appLink}\n\nAfter opening, follow the install instructions.`;
-  
+
   if (navigator.share) {
     navigator.share({
       title: '💒 Wedding App - Install Link',
@@ -1972,12 +2187,12 @@ function saveCustomTask() {
   const assignee = document.getElementById('newTaskAssignee').value;
   const dueDate = document.getElementById('newTaskDueDate').value;
   const priority = document.getElementById('newTaskPriority').value;
-  
+
   if (!taskName) {
     alert('Please enter a task name');
     return;
   }
-  
+
   const newTask = {
     id: 'custom_' + Date.now(),
     task: taskName,
@@ -1987,7 +2202,7 @@ function saveCustomTask() {
     isCustom: true,
     createdAt: new Date().toISOString()
   };
-  
+
   // Use Firebase sync if available
   if (window.firebaseSync && window.firebaseSync.addCustomTask) {
     window.firebaseSync.addCustomTask(newTask);
@@ -1997,7 +2212,7 @@ function saveCustomTask() {
     customTasks.push(newTask);
     localStorage.setItem('customTasks', JSON.stringify(customTasks));
   }
-  
+
   hideAddTaskForm();
   renderApp();
   alert('✅ Task added successfully!');
@@ -2005,7 +2220,7 @@ function saveCustomTask() {
 
 function deleteCustomTaskById(taskId) {
   if (!confirm('Delete this task?')) return;
-  
+
   // Use Firebase sync if available
   if (window.firebaseSync && window.firebaseSync.deleteCustomTask) {
     window.firebaseSync.deleteCustomTask(taskId);
@@ -2015,7 +2230,7 @@ function deleteCustomTaskById(taskId) {
     customTasks = customTasks.filter(t => t.id !== taskId);
     localStorage.setItem('customTasks', JSON.stringify(customTasks));
   }
-  
+
   renderApp();
 }
 
@@ -2130,7 +2345,7 @@ function saveNewEvent() {
 function formatTime(time24) {
   const [h, m] = time24.split(':');
   const hour = parseInt(h);
-  const ampm = hour>= 12 ? 'PM' : 'AM';
+  const ampm = hour >= 12 ? 'PM' : 'AM';
   const hour12 = hour % 12 || 12;
   return `${hour12}:${m} ${ampm}`;
 }
@@ -2290,17 +2505,17 @@ window.pullDataFromFirebase = pullDataFromFirebase;
 function sendAnnouncement() {
   const text = document.getElementById('announcementText').value.trim();
   const priority = document.getElementById('announcementPriority').value;
-  
+
   if (!text) {
     alert('Please enter an announcement message');
     return;
   }
-  
+
   if (window.firebaseSync && window.firebaseSync.sendAnnouncement) {
     window.firebaseSync.sendAnnouncement(text, priority);
     document.getElementById('announcementText').value = '';
     alert('📢 Announcement sent to all users!');
-    
+
     // Log activity
     if (window.firebaseSync.logActivity) {
       window.firebaseSync.logActivity('announcement', { message: text, priority });
@@ -2313,7 +2528,7 @@ function sendAnnouncement() {
 // Push all local data to Firebase
 function pushDataToFirebase() {
   if (!confirm('This will upload all events, guests, and tasks to Firebase. Continue?')) return;
-  
+
   if (window.firebaseSync && window.firebaseSync.pushAllDataToFirebase) {
     window.firebaseSync.pushAllDataToFirebase().then(success => {
       if (success) {
@@ -2328,7 +2543,7 @@ function pushDataToFirebase() {
 // Pull data from Firebase to local
 function pullDataFromFirebase() {
   if (!confirm('This will download the latest data from Firebase. Local changes may be overwritten. Continue?')) return;
-  
+
   if (window.firebaseSync && window.firebaseSync.initializeFromFirebase) {
     window.firebaseSync.initializeFromFirebase().then(success => {
       if (success) {
