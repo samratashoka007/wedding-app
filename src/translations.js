@@ -245,7 +245,16 @@ const TRANSLATIONS = {
         pleaseSelectPhoto: "Please select a photo to upload",
         uploading: "Uploading...",
         photoUploaded: "Photo uploaded successfully!",
-        confirmDeletePhoto: "Are you sure you want to delete this photo?"
+        confirmDeletePhoto: "Are you sure you want to delete this photo?",
+
+        // Resort Policies
+        policies: "Policies",
+        resortPolicies: "Resort Policies",
+        resortPoliciesSubtitle: "Important guidelines for all guests during the wedding events",
+        policy1: "Room - 2 Towel + 1 Shampoo + 1 Conditioner + 1 Soap + 5 Liter Jug",
+        policy2: "Room Cleaning Service - 7:30 am to 10:30 pm",
+        policy3: "If Chori in Swimming Pool - Cleaning & Empty Charge by Party",
+        policy4: "Generator Rent - 5000 RS and Extra - 1500 / Hour also 20 RS / Unit"
     },
 
     hi: {
@@ -491,7 +500,21 @@ const TRANSLATIONS = {
         pleaseSelectPhoto: "कृपया अपलोड करने के लिए फोटो चुनें",
         uploading: "अपलोड हो रहा है...",
         photoUploaded: "फोटो सफलतापूर्वक अपलोड हो गया!",
-        confirmDeletePhoto: "क्या आप इस फोटो को हटाना चाहते हैं?"
+        confirmDeletePhoto: "क्या आप इस फोटो को हटाना चाहते हैं?",
+
+        // Resort Policies
+        policies: "नीतियाँ",
+        resortPolicies: "रिसॉर्ट नीतियाँ",
+        resortPoliciesSubtitle: "शादी के कार्यक्रमों के दौरान सभी मेहमानों के लिए महत्वपूर्ण दिशानिर्देश",
+        policy1: "फंक्शन की तारीख से 15 दिन पहले सभी भुगतान पूरा करना होगा",
+        policy2: "कमरा - 2 तौलिए + 1 शैम्पू + 1 कंडीशनर + 1 साबुन + 5 लीटर जग",
+        policy3: "रूम वेटर सेवा / सफाई सेवा - सुबह 7:30 से रात 10:30 बजे तक",
+        policy4: "नटराज रिसॉर्ट - 32 कमरे (क्षमता - 120 से 130)",
+        policy5: "सभी सजावट और फंक्शन की बिजली पार्टी पर",
+        policy6: "फन रिसॉर्ट - 2 कमरे, कुर्सियों के साथ बैंक्वेट (केवल अंदर उपयोग)",
+        policy7: "फन रिसॉर्ट - रु. 20 / यूनिट - लाइट, इवेंट, कैमरा, डेकोरेशन, केटरिंग डिस्प्ले के लिए अतिरिक्त शुल्क",
+        policy8: "स्विमिंग पूल में चोरी होने पर - सफाई और खाली करने का खर्च पार्टी द्वारा",
+        policy9: "स्विमिंग पूल उपयोग - तौलिया चार्जेबल"
     },
 
     gu: {
@@ -737,7 +760,21 @@ const TRANSLATIONS = {
         pleaseSelectPhoto: "કૃપયા અપલોડ કરવા માટે ફોટો પસંદ કરો",
         uploading: "અપલોડ થઈ રહ્યું છે...",
         photoUploaded: "ફોટો સફળતાપૂર્વક અપલોડ થયો!",
-        confirmDeletePhoto: "શું તમે આ ફોટો કાઢી નાખવા માંગો છો?"
+        confirmDeletePhoto: "શું તમે આ ફોટો કાઢી નાખવા માંગો છો?",
+
+        // Resort Policies
+        policies: "નીતિઓ",
+        resortPolicies: "રિસોર્ટ નીતિઓ",
+        resortPoliciesSubtitle: "લગ્ન સમારોહ દરમિયાન તમામ મહેમાનો માટે મહત્વપૂર્ણ માર્ગદર્શિકા",
+        policy1: "ફંક્શનની તારીખના 15 દિવસ પહેલા તમામ ચુકવણી પૂર્ણ કરવી જરૂરી છે",
+        policy2: "રૂમ - 2 ટુવાલ + 1 શેમ્પૂ + 1 કન્ડીશનર + 1 સાબુ + 5 લીટર જગ",
+        policy3: "રૂમ વેટર સેવા / સફાઈ સેવા - સવારે 7:30 થી રાત્રે 10:30 સુધી",
+        policy4: "નટરાજ રિસોર્ટ - 32 રૂમ (ક્ષમતા - 120 થી 130)",
+        policy5: "તમામ ડેકોર અને ફંક્શન વીજળી પાર્ટી પર",
+        policy6: "ફન રિસોર્ટ - 2 રૂમ, ખુરશી સાથે બેંક્વેટ (માત્ર અંદર ઉપયોગ)",
+        policy7: "ફન રિસોર્ટ - રૂ. 20 / યુનિટ - લાઇટ, ઇવેન્ટ, કેમેરા, ડેકોરેશન, કેટરિંગ ડિસ્પ્લે માટે વધારાનો ચાર્જ",
+        policy8: "સ્વિમિંગ પૂલમાં ચોરી થાય તો - સફાઈ અને ખાલી કરવાનો ખર્ચ પાર્ટી દ્વારા",
+        policy9: "સ્વિમિંગ પૂલ ઉપયોગ - ટુવાલ ચાર્જેબલ"
     }
 };
 

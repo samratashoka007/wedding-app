@@ -530,6 +530,10 @@ function getNavTabs() {
         <span>⚙️</span>
         <span>${t('settings')}</span>
       </button>
+      <button class="nav-tab ${currentTab === 'policies' ? 'active' : ''}" data-tab="policies">
+        <span>📋</span>
+        <span>${t('policies')}</span>
+      </button>
   `;
   } else if (currentUser.role === 'coordinator') {
     return `
@@ -557,6 +561,10 @@ function getNavTabs() {
         <span>👥</span>
         <span>${t('team')}</span>
       </button>
+      <button class="nav-tab ${currentTab === 'policies' ? 'active' : ''}" data-tab="policies">
+        <span>📋</span>
+        <span>${t('policies')}</span>
+      </button>
   `;
   } else {
     return `
@@ -580,6 +588,10 @@ function getNavTabs() {
         <span>📞</span>
         <span>${t('help')}</span>
       </button>
+      <button class="nav-tab ${currentTab === 'policies' ? 'active' : ''}" data-tab="policies">
+        <span>📋</span>
+        <span>${t('policies')}</span>
+      </button>
   `;
   }
 }
@@ -600,6 +612,7 @@ function getTabContent() {
       case 'tasks': return renderAdminTasks();
       case 'vendors': return renderAdminVendors();
       case 'settings': return renderAdminSettings();
+      case 'policies': return renderPolicies();
       default: return renderAdminDashboard();
     }
   } else if (currentUser.role === 'coordinator') {
@@ -610,6 +623,7 @@ function getTabContent() {
       case 'guests': return renderGuestListTab();
       case 'vendors': return renderVendorsTab();
       case 'team': return renderTeamTab();
+      case 'policies': return renderPolicies();
       default: return renderMyTasks();
     }
   } else {
@@ -619,9 +633,49 @@ function getTabContent() {
       case 'meals': return renderMealsTab();
       case 'myroom': return renderMyRoomTab();
       case 'help': return renderContactsTab();
+      case 'policies': return renderPolicies();
       default: return renderEventsTabGuest();
     }
   }
+}
+
+// Render Resort Policies Page
+function renderPolicies() {
+  const policies = [
+    { icon: '💰', key: 'policy1', emoji: '💳' },
+    { icon: '🛏️', key: 'policy2', emoji: '🧴' },
+    { icon: '🧹', key: 'policy3', emoji: '⏰' },
+    { icon: '⚡', key: 'policy4', emoji: '⚡' },
+  ];
+
+  return `
+    <div class="policies-container">
+      <div class="section-header">
+        <span class="emoji">📋</span>
+        <h2>${t('resortPolicies')}</h2>
+      </div>
+      <p class="policies-subtitle">${t('resortPoliciesSubtitle')}</p>
+      
+      <div class="policies-list">
+        ${policies.map((policy, index) => `
+          <div class="policy-card">
+            <div class="policy-number">${index + 1}</div>
+            <div class="policy-icon">${policy.emoji}</div>
+            <div class="policy-content">
+              <p class="policy-text">${t(policy.key)}</p>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+      
+      <div class="policies-footer">
+        <div class="policy-note">
+          <span class="note-icon">ℹ️</span>
+          <p>For any queries regarding these policies, please contact the coordinators.</p>
+        </div>
+      </div>
+    </div>
+  `;
 }
 
 // Render My Tasks (Coordinator Only) - Shows ALL assigned tasks across all days
