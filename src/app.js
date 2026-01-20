@@ -1626,6 +1626,9 @@ function renderAdminGuests() {
 
 // Admin Tasks
 function renderAdminTasks() {
+  const dayTasks = window.getEditableDayTasks ? window.getEditableDayTasks() : DAY_TASKS;
+  const coordinators = window.getCoordinatorNames ? window.getCoordinatorNames() : [];
+
   return `
     <div class="section-header">
       <span class="emoji">✅</span>
@@ -1635,6 +1638,76 @@ function renderAdminTasks() {
     <button class="add-btn" onclick="showAddTaskForm()">➕ ${t('addTask')}</button>
     
     <div id="taskFormContainer"></div>
+    
+    <!-- Edit Task Modal -->
+    <div id="editTaskModal" class="edit-task-modal" style="display:none;">
+      <div class="edit-task-content">
+        <div class="edit-task-header">
+          <h3>✏️ Edit Task</h3>
+          <button class="close-modal-btn" onclick="hideEditTaskModal()">×</button>
+        </div>
+        <form id="editTaskForm" onsubmit="saveTaskEdit(event)">
+          <input type="hidden" id="editTaskId" value="">
+          
+          <div class="form-row">
+            <label>📋 Event</label>
+            <input type="text" id="editTaskEvent" readonly class="form-input readonly">
+          </div>
+          
+          <div class="form-row">
+            <label>👑 Owner</label>
+            <select id="editTaskOwner" class="form-select">
+              <option value="">None</option>
+              ${coordinators.map(c => `<option value="${c}">${c}</option>`).join('')}
+            </select>
+          </div>
+          
+          <div class="form-row">
+            <label>👥 Crowd Lead</label>
+            <select id="editTaskCrowdLead" class="form-select">
+              <option value="">None</option>
+              ${coordinators.map(c => `<option value="${c}">${c}</option>`).join('')}
+            </select>
+          </div>
+          
+          <div class="form-row">
+            <label>🤝 Support</label>
+            <input type="text" id="editTaskSupport" class="form-input" placeholder="e.g., Jay, Priyanshu">
+            <small class="form-hint">Separate multiple names with commas</small>
+          </div>
+          
+          <div class="form-row">
+            <label>📝 Action</label>
+            <textarea id="editTaskAction" class="form-textarea" rows="2"></textarea>
+          </div>
+          
+          <div class="form-row">
+            <label>⚠️ Priority</label>
+            <select id="editTaskPriority" class="form-select">
+              <option value="low">Low</option>
+              <option value="medium">Medium</option>
+              <option value="high">High</option>
+              <option value="critical">Critical</option>
+            </select>
+          </div>
+          
+          <div class="form-row">
+            <label>🏢 Vendor</label>
+            <input type="text" id="editTaskVendor" class="form-input" placeholder="e.g., Decor, Caterer">
+          </div>
+          
+          <div class="form-row">
+            <label>🚨 Escalation</label>
+            <input type="text" id="editTaskEscalation" class="form-input" placeholder="e.g., Vicky → Dharmesh">
+          </div>
+          
+          <div class="form-actions">
+            <button type="button" class="btn-secondary" onclick="hideEditTaskModal()">Cancel</button>
+            <button type="submit" class="btn-primary">💾 Save Changes</button>
+          </div>
+        </form>
+      </div>
+    </div>
     
     <h3 style="margin:1rem 0 0.5rem;">${t('preWeddingTasks')}</h3>
     ${editableData.preWeddingTasks.map(task => `
@@ -1653,8 +1726,45 @@ function renderAdminTasks() {
     `).join('')
     }
     
-    <h3 style="margin:1.5rem 0 0.5rem;">${t('weddingDayTasks')}</h3>
-    <p style="color:#666;font-size:0.85rem;">${t('day1')}: ${DAY_TASKS['24'].length} ${t('tasksLabel')} | ${t('day2')}: ${DAY_TASKS['25'].length} ${t('tasksLabel')} | ${t('day3')}: ${DAY_TASKS['26'].length} ${t('tasksLabel')}</p>
+    <h3 style="margin:1.5rem 0 0.5rem;">📅 ${t('day1')} - 24 Jan (Haldi & Sangeet)</h3>
+    <div class="day-tasks-list">
+      ${(dayTasks['24'] || []).map(task => renderAdminDayTaskCard(task)).join('')}
+    </div>
+    
+    <h3 style="margin:1.5rem 0 0.5rem;">💒 ${t('day2')} - 25 Jan (Wedding)</h3>
+    <div class="day-tasks-list">
+      ${(dayTasks['25'] || []).map(task => renderAdminDayTaskCard(task)).join('')}
+    </div>
+    
+    <h3 style="margin:1.5rem 0 0.5rem;">🎉 ${t('day3')} - 26 Jan (Reception)</h3>
+    <div class="day-tasks-list">
+      ${(dayTasks['26'] || []).map(task => renderAdminDayTaskCard(task)).join('')}
+    </div>
+  `;
+}
+
+// Render a single day task card for admin view
+function renderAdminDayTaskCard(task) {
+  const priorityClass = task.priority === 'critical' ? 'priority-critical' :
+    task.priority === 'high' ? 'priority-high' : 'priority-medium';
+  return `
+    <div class="admin-day-task-card ${priorityClass}">
+      <div class="task-time-col">
+        <span class="task-time">${task.time}</span>
+      </div>
+      <div class="task-details-col">
+        <div class="task-event-name">${task.event}</div>
+        <div class="task-assignments">
+          <span class="assignment owner">👑 ${task.owner || 'Unassigned'}</span>
+          ${task.crowdLead ? `<span class="assignment crowd">👥 ${task.crowdLead}</span>` : ''}
+          ${task.support ? `<span class="assignment support">🤝 ${task.support}</span>` : ''}
+        </div>
+        <div class="task-action-text">${task.action || ''}</div>
+      </div>
+      <div class="task-edit-col">
+        <button class="edit-task-btn" onclick="showEditTaskModal(${task.id})" title="Edit Task">✏️</button>
+      </div>
+    </div>
   `;
 }
 
@@ -2580,8 +2690,69 @@ window.saveCustomTask = saveCustomTask;
 window.deleteCustomTaskById = deleteCustomTaskById;
 window.sendAnnouncement = sendAnnouncement;
 window.dismissAnnouncement = dismissAnnouncement;
+window.showEditTaskModal = showEditTaskModal;
+window.hideEditTaskModal = hideEditTaskModal;
+window.saveTaskEdit = saveTaskEdit;
 window.pushDataToFirebase = pushDataToFirebase;
 window.pullDataFromFirebase = pullDataFromFirebase;
+
+// Show edit task modal
+function showEditTaskModal(taskId) {
+  const task = window.getDayTask ? window.getDayTask(taskId) : null;
+  if (!task) {
+    alert('Task not found');
+    return;
+  }
+
+  // Populate form fields
+  document.getElementById('editTaskId').value = taskId;
+  document.getElementById('editTaskEvent').value = task.event || '';
+  document.getElementById('editTaskOwner').value = task.owner || '';
+  document.getElementById('editTaskCrowdLead').value = task.crowdLead || '';
+  document.getElementById('editTaskSupport').value = task.support || '';
+  document.getElementById('editTaskAction').value = task.action || '';
+  document.getElementById('editTaskPriority').value = task.priority || 'medium';
+  document.getElementById('editTaskVendor').value = task.vendor || '';
+  document.getElementById('editTaskEscalation').value = task.escalation || '';
+
+  // Show modal
+  document.getElementById('editTaskModal').style.display = 'flex';
+}
+
+// Hide edit task modal
+function hideEditTaskModal() {
+  document.getElementById('editTaskModal').style.display = 'none';
+}
+
+// Save task edit
+function saveTaskEdit(event) {
+  event.preventDefault();
+
+  const taskId = parseFloat(document.getElementById('editTaskId').value);
+  const updates = {
+    owner: document.getElementById('editTaskOwner').value || null,
+    crowdLead: document.getElementById('editTaskCrowdLead').value || null,
+    support: document.getElementById('editTaskSupport').value || null,
+    action: document.getElementById('editTaskAction').value,
+    priority: document.getElementById('editTaskPriority').value,
+    vendor: document.getElementById('editTaskVendor').value,
+    escalation: document.getElementById('editTaskEscalation').value
+  };
+
+  // Update via data layer
+  if (window.updateDayTask) {
+    const success = window.updateDayTask(taskId, updates);
+    if (success) {
+      hideEditTaskModal();
+      renderDashboard();
+      alert('✅ Task updated successfully!');
+    } else {
+      alert('❌ Failed to update task');
+    }
+  } else {
+    alert('❌ Update function not available');
+  }
+}
 
 // Dismiss an announcement (hide it for this user)
 function dismissAnnouncement(announcementKey) {

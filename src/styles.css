@@ -3924,3 +3924,309 @@ body.offline .sync-status-badge .sync-dot {
     padding: 0.4rem 0.6rem;
   }
 }
+
+/* ========================================
+   ADMIN TASK EDITOR STYLES
+   ======================================== */
+
+/* Edit Task Modal */
+.edit-task-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  padding: 1rem;
+  backdrop-filter: blur(4px);
+}
+
+.edit-task-content {
+  background: white;
+  border-radius: 16px;
+  max-width: 500px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+.edit-task-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.25rem;
+  background: var(--gradient);
+  color: white;
+  border-radius: 16px 16px 0 0;
+}
+
+.edit-task-header h3 {
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.close-modal-btn {
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  color: white;
+  font-size: 1.5rem;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.close-modal-btn:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: scale(1.1);
+}
+
+#editTaskForm {
+  padding: 1.25rem;
+}
+
+.form-row {
+  margin-bottom: 1rem;
+}
+
+.form-row label {
+  display: block;
+  font-weight: 600;
+  font-size: 0.85rem;
+  margin-bottom: 0.35rem;
+  color: var(--dark);
+}
+
+.form-input,
+.form-select,
+.form-textarea {
+  width: 100%;
+  padding: 0.65rem 0.85rem;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-family: inherit;
+  transition: all 0.2s ease;
+}
+
+.form-input:focus,
+.form-select:focus,
+.form-textarea:focus {
+  outline: none;
+  border-color: var(--burgundy);
+  box-shadow: 0 0 0 3px rgba(139, 0, 0, 0.1);
+}
+
+.form-input.readonly {
+  background: #f5f5f5;
+  color: #666;
+}
+
+.form-hint {
+  display: block;
+  font-size: 0.75rem;
+  color: var(--gray);
+  margin-top: 0.25rem;
+}
+
+.form-actions {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid #eee;
+}
+
+.btn-primary,
+.btn-secondary {
+  flex: 1;
+  padding: 0.75rem 1rem;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-primary {
+  background: var(--gradient);
+  color: white;
+}
+
+.btn-primary:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+.btn-secondary {
+  background: #f0f0f0;
+  color: var(--dark);
+}
+
+.btn-secondary:hover {
+  background: #e0e0e0;
+}
+
+/* Admin Day Task Cards */
+.day-tasks-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.admin-day-task-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  background: white;
+  border-radius: 10px;
+  padding: 0.75rem;
+  box-shadow: var(--shadow-sm);
+  border-left: 4px solid var(--burgundy);
+  transition: all 0.2s ease;
+}
+
+.admin-day-task-card:hover {
+  transform: translateX(3px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+}
+
+.admin-day-task-card.priority-critical {
+  border-left-color: #E74C3C;
+  background: linear-gradient(90deg, rgba(231, 76, 60, 0.05) 0%, white 100%);
+}
+
+.admin-day-task-card.priority-high {
+  border-left-color: #F39C12;
+  background: linear-gradient(90deg, rgba(243, 156, 18, 0.05) 0%, white 100%);
+}
+
+.admin-day-task-card.priority-medium {
+  border-left-color: var(--burgundy);
+}
+
+.task-time-col {
+  min-width: 65px;
+  flex-shrink: 0;
+}
+
+.task-time-col .task-time {
+  background: var(--cream);
+  padding: 0.25rem 0.5rem;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--burgundy);
+  display: inline-block;
+}
+
+.task-details-col {
+  flex: 1;
+  min-width: 0;
+}
+
+.task-details-col .task-event-name {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--dark);
+  margin-bottom: 0.35rem;
+}
+
+.task-assignments {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-bottom: 0.35rem;
+}
+
+.assignment {
+  font-size: 0.7rem;
+  padding: 0.15rem 0.5rem;
+  border-radius: 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+}
+
+.assignment.owner {
+  background: linear-gradient(135deg, var(--gold) 0%, #B8860B 100%);
+  color: var(--dark);
+  font-weight: 600;
+}
+
+.assignment.crowd {
+  background: #9B59B6;
+  color: white;
+}
+
+.assignment.support {
+  background: #3498DB;
+  color: white;
+}
+
+.task-action-text {
+  font-size: 0.75rem;
+  color: var(--gray);
+  line-height: 1.4;
+}
+
+.task-edit-col {
+  flex-shrink: 0;
+}
+
+.edit-task-btn {
+  background: rgba(139, 0, 0, 0.1);
+  border: none;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.edit-task-btn:hover {
+  background: var(--burgundy);
+  color: white;
+  transform: scale(1.1);
+}
+
+/* Responsive adjustments */
+@media (max-width: 480px) {
+  .admin-day-task-card {
+    flex-wrap: wrap;
+  }
+
+  .task-time-col {
+    min-width: auto;
+  }
+
+  .task-edit-col {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+  }
+
+  .admin-day-task-card {
+    position: relative;
+    padding-right: 3rem;
+  }
+
+  .edit-task-content {
+    max-height: 85vh;
+  }
+}

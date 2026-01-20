@@ -1510,6 +1510,69 @@ function deletePreWeddingTask(taskId) {
     }
 }
 
+// ====== DAY TASKS EDITING ======
+
+// Get editable day tasks - reload from localStorage for fresh data
+function getEditableDayTasks() {
+    const saved = localStorage.getItem('weddingAppData');
+    if (saved) {
+        try {
+            const data = JSON.parse(saved);
+            if (data.dayTasks) {
+                editableData.dayTasks = data.dayTasks;
+            }
+        } catch (e) {
+            console.error('Failed to reload day tasks:', e);
+        }
+    }
+    return editableData.dayTasks;
+}
+
+// Get a single day task by ID
+function getDayTask(taskId) {
+    const dayTasks = getEditableDayTasks();
+    for (const day of Object.keys(dayTasks)) {
+        const task = dayTasks[day].find(t => t.id === taskId || t.id === parseFloat(taskId));
+        if (task) {
+            return { ...task, _day: day };
+        }
+    }
+    return null;
+}
+
+// Update a day task
+function updateDayTask(taskId, updates) {
+    const dayTasks = getEditableDayTasks();
+    let updated = false;
+
+    for (const day of Object.keys(dayTasks)) {
+        const idx = dayTasks[day].findIndex(t => t.id === taskId || t.id === parseFloat(taskId));
+        if (idx !== -1) {
+            dayTasks[day][idx] = { ...dayTasks[day][idx], ...updates };
+            updated = true;
+
+            // Sync to Firebase
+            if (window.firebaseSync && window.firebaseSync.syncDayTask) {
+                window.firebaseSync.syncDayTask(dayTasks[day][idx], 'update');
+            }
+            break;
+        }
+    }
+
+    if (updated) {
+        editableData.dayTasks = dayTasks;
+        saveEditableData(editableData);
+    }
+
+    return updated;
+}
+
+// Get all coordinator names for dropdown options
+function getCoordinatorNames() {
+    const allCoords = typeof getAllCoordinators === 'function' ? getAllCoordinators() : WEDDING_DATA.coordinators;
+    return allCoords.map(c => c.name);
+}
+
 // Get editable events (for rendering) - reload from localStorage for fresh data
 function getEditableEvents() {
     // Reload from localStorage to get latest Firebase-synced data
@@ -1948,6 +2011,10 @@ window.GUEST_LIST = GUEST_LIST;
 window.BUS_TRAVEL = BUS_TRAVEL;
 window.PRE_WEDDING_TASKS = PRE_WEDDING_TASKS;
 window.DAY_TASKS = DAY_TASKS;
+window.getEditableDayTasks = getEditableDayTasks;
+window.getDayTask = getDayTask;
+window.updateDayTask = updateDayTask;
+window.getCoordinatorNames = getCoordinatorNames;
 window.ALL_TASKS = ALL_TASKS;
 window.ADMIN_USERS = ADMIN_USERS;
 window.DEFAULT_COORDINATOR_OTPS = DEFAULT_COORDINATOR_OTPS;

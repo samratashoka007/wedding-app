@@ -304,6 +304,75 @@ function syncSendAnnouncement(message, priority = 'normal') {
     db.ref('announcements').push(announcement);
 }
 
+// === DAY TASKS SYNC (Wedding day task assignments) ===
+function initDayTasksSync() {
+    if (!firebaseInitialized) return;
+
+    db.ref('dayTasks').on('value', (snapshot) => {
+        const tasks = snapshot.val();
+        if (tasks) {
+            // Update localStorage
+            const saved = localStorage.getItem('weddingAppData');
+            if (saved) {
+                try {
+                    const data = JSON.parse(saved);
+                    data.dayTasks = tasks;
+                    localStorage.setItem('weddingAppData', JSON.stringify(data));
+                } catch (e) {
+                    console.error('Failed to update day tasks:', e);
+                }
+            }
+            triggerAppRefresh();
+            console.log("📋 Day tasks synced from Firebase");
+        }
+    });
+}
+
+// Push day tasks to Firebase (initial sync)
+function pushDayTasksToFirebase() {
+    if (!firebaseInitialized) return Promise.resolve(false);
+
+    const dayTasks = window.getEditableDayTasks ? window.getEditableDayTasks() : window.DAY_TASKS;
+    return db.ref('dayTasks').set(dayTasks)
+        .then(() => {
+            console.log("📤 Day tasks pushed to Firebase");
+            return true;
+        })
+        .catch(err => {
+            console.error("Failed to push day tasks:", err);
+            return false;
+        });
+}
+
+// Sync a single day task update
+function syncDayTask(task, action = 'update') {
+    if (!firebaseInitialized) return;
+
+    // Get the day key from task date
+    const dayKey = task.date.includes('24') ? '24' :
+        task.date.includes('25') ? '25' : '26';
+
+    // Find task index
+    db.ref(`dayTasks/${dayKey}`).once('value', (snapshot) => {
+        const tasks = snapshot.val() || [];
+        const idx = tasks.findIndex(t => t.id === task.id);
+
+        if (idx !== -1) {
+            // Update the specific task
+            db.ref(`dayTasks/${dayKey}/${idx}`).update(task)
+                .then(() => console.log("✅ Day task synced:", task.event))
+                .catch(err => console.error("Day task sync failed:", err));
+        }
+    });
+
+    // Log activity
+    logActivity('update_day_task', {
+        taskId: task.id,
+        event: task.event,
+        changes: { owner: task.owner, support: task.support }
+    });
+}
+
 // === ACTIVITY LOG (Track who did what) ===
 function logActivity(action, details) {
     if (!firebaseInitialized) return;
@@ -529,6 +598,7 @@ document.addEventListener('DOMContentLoaded', () => {
         initGuestsSync();
         initAnnouncementsSync();
         initDecorationPhotosSync();
+        initDayTasksSync();
 
         // Load initial data
         initializeFromFirebase();
@@ -551,6 +621,8 @@ window.firebaseSync = {
     markTaskComplete: syncMarkTaskComplete,
     addCustomTask: syncAddCustomTask,
     deleteCustomTask: syncDeleteCustomTask,
+    syncDayTask,
+    pushDayTasksToFirebase,
 
     // Event operations
     syncEvent,
