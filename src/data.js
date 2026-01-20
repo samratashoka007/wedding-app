@@ -1568,9 +1568,24 @@ function updateDayTask(taskId, updates) {
 }
 
 // Get all coordinator names for dropdown options
+// Includes both short names (used in tasks) and full names
 function getCoordinatorNames() {
     const allCoords = typeof getAllCoordinators === 'function' ? getAllCoordinators() : WEDDING_DATA.coordinators;
-    return allCoords.map(c => c.name);
+    const names = new Set();
+
+    allCoords.forEach(c => {
+        // Add full name
+        names.add(c.name);
+        // Add first name (short name used in task assignments)
+        const firstName = c.name.split(' ')[0];
+        if (firstName) names.add(firstName);
+    });
+
+    // Add additional names used in tasks that might not be in coordinator list
+    const additionalNames = ['Mukesh Nagar', 'Mukesh', 'Jayant Chauhan', 'Jayant'];
+    additionalNames.forEach(n => names.add(n));
+
+    return Array.from(names).sort();
 }
 
 // Get editable events (for rendering) - reload from localStorage for fresh data
