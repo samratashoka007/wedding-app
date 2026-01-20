@@ -3297,6 +3297,34 @@ h4 {
   color: var(--gray);
 }
 
+.announcement-dismiss {
+  background: rgba(0, 0, 0, 0.1);
+  border: none;
+  color: var(--dark);
+  font-size: 1.2rem;
+  font-weight: bold;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+  margin-left: 0.5rem;
+}
+
+.announcement-dismiss:hover {
+  background: rgba(0, 0, 0, 0.2);
+  transform: scale(1.1);
+}
+
+.announcement-dismiss:active {
+  transform: scale(0.95);
+}
+
+
 /* Announcement Form */
 .announcement-form textarea {
   font-family: inherit;

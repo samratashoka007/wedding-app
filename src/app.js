@@ -458,9 +458,18 @@ function renderDashboard() {
   const roleLabel = t(currentUser.role);
   const syncStatus = window.firebaseSync ? window.firebaseSync.getSyncStatus() : { isFirebaseConnected: false };
 
-  // Get any announcements
+  // Get any announcements (filter out dismissed ones and old announcements > 24 hours)
   const announcements = JSON.parse(localStorage.getItem('announcements') || '[]');
-  const latestAnnouncement = announcements.length > 0 ? announcements[0] : null;
+  const dismissedAnnouncements = JSON.parse(localStorage.getItem('dismissedAnnouncements') || '[]');
+  const now = Date.now();
+  const twentyFourHoursAgo = now - (24 * 60 * 60 * 1000);
+
+  // Filter: not dismissed AND within last 24 hours
+  const activeAnnouncements = announcements.filter(a =>
+    !dismissedAnnouncements.includes(a.key) &&
+    a.timestamp > twentyFourHoursAgo
+  );
+  const latestAnnouncement = activeAnnouncements.length > 0 ? activeAnnouncements[0] : null;
 
   app.innerHTML = `
     <header class="app-header">
@@ -485,10 +494,11 @@ function renderDashboard() {
         </p>
       </div>
       ${latestAnnouncement ? `
-        <div class="announcement-banner ${latestAnnouncement.priority}">
+        <div class="announcement-banner ${latestAnnouncement.priority}" id="announcementBanner">
           <span class="announcement-icon">📢</span>
           <span class="announcement-text">${latestAnnouncement.message}</span>
           <span class="announcement-time">${getTimeAgo(latestAnnouncement.timestamp)}</span>
+          <button class="announcement-dismiss" onclick="dismissAnnouncement('${latestAnnouncement.key}')" title="Dismiss">×</button>
         </div>
       ` : ''}
     </header>
@@ -2569,8 +2579,27 @@ window.hideAddTaskForm = hideAddTaskForm;
 window.saveCustomTask = saveCustomTask;
 window.deleteCustomTaskById = deleteCustomTaskById;
 window.sendAnnouncement = sendAnnouncement;
+window.dismissAnnouncement = dismissAnnouncement;
 window.pushDataToFirebase = pushDataToFirebase;
 window.pullDataFromFirebase = pullDataFromFirebase;
+
+// Dismiss an announcement (hide it for this user)
+function dismissAnnouncement(announcementKey) {
+  const dismissed = JSON.parse(localStorage.getItem('dismissedAnnouncements') || '[]');
+  if (!dismissed.includes(announcementKey)) {
+    dismissed.push(announcementKey);
+  }
+
+  // Clean up old dismissed keys that are no longer in the announcements list
+  const announcements = JSON.parse(localStorage.getItem('announcements') || '[]');
+  const validKeys = announcements.map(a => a.key);
+  const cleanedDismissed = dismissed.filter(key => validKeys.includes(key));
+
+  localStorage.setItem('dismissedAnnouncements', JSON.stringify(cleanedDismissed));
+
+  // Re-render to hide the announcement
+  renderDashboard();
+}
 
 // Send announcement to all users
 function sendAnnouncement() {
