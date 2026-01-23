@@ -698,17 +698,34 @@ const WEDDING_DATA = {
             area: "Travel (Bus)",
             areaHindi: "ट्रैवल (बस)",
             days: "24/26",
-            contact: "Pending",
-            phone: "TBD",
+            contact: "Bus 1: Bhavesh | Bus 2: Sohan Nana",
+            phone: "9265635758",
+            phone2: "7023530066",
             poc: "Hardik",
             backup: "Vicky",
             commitments: [
-                "24th: 8:30 AM pickup (2 buses, 52 seater, 30 min buffer)",
-                "26th: 10:30 AM resort to houses, intermediate drop route"
+                "🚌 BUS 1 - GJ 27 TD 8898 (Bhavesh: 92656 35758)",
+                "  Pickup: Isanpur - A/5, Saarthi Tenament, Navrang Tenament ni Bajuma, Parshweshwar Mahadev Road, Isanpur – 382243",
+                "  POC: Hardik (Primary), Vicky, Bhanvarlal",
+                "",
+                "🚌 BUS 2 - GJ 01 FT 8904 (Sohan Nana: 70235 30066)",
+                "  Pickup: Hathijan - D-15, Pushpak City, Golden Leaf Restaurant, Mahemdabad Road, Hathijan - 382445",
+                "  POC: Hardik (Primary), Priyanshu, Jayant",
+                "",
+                "📍 Drop Location: Natraj Resort, Gandhinagar-Vijapur Road, Mahudi, Delwad, Gujarat – 382845",
+                "🕗 24th: 8:00 AM pickup | 26th: 10:30 AM resort to houses"
             ],
             commitmentsHindi: [
-                "24th: 8:30 AM pickup (2 बस, 52 सीटर, 30 min buffer)",
-                "26th: 10:30 AM रिसोर्ट से घर, intermediate drop route"
+                "🚌 बस 1 - GJ 27 TD 8898 (भावेश: 92656 35758)",
+                "  पिकअप: इसनपुर - A/5, सारथी टेनामेंट, नवरंग टेनामेंट के बाजू में, पार्श्वेश्वर महादेव रोड, इसनपुर – 382243",
+                "  POC: हार्दिक (प्राइमरी), विकी, भंवरलाल",
+                "",
+                "🚌 बस 2 - GJ 01 FT 8904 (सोहन नाना: 70235 30066)",
+                "  पिकअप: हाथीजण - D-15, पुष्पक सिटी, गोल्डन लीफ रेस्टोरेंट, महेमदाबाद रोड, हाथीजण - 382445",
+                "  POC: हार्दिक (प्राइमरी), प्रियांशु, जयंत",
+                "",
+                "📍 ड्रॉप: नटराज रिसोर्ट, गांधीनगर-विजापुर रोड, महुड़ी, देलवाड़, गुजरात – 382845",
+                "🕗 24th: 8:00 AM पिकअप | 26th: 10:30 AM रिसोर्ट से घर"
             ]
         }
     ],
